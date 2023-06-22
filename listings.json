@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html",
       "/posts/image-clasification/quarto-prueba.html",
       "/posts/post-with-code/index.html",
       "/posts/welcome/index.html"
