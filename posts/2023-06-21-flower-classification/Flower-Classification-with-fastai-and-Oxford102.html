@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2023-06-21">
 <meta name="description" content="Entrenemos juntos un clasificador de flores usando el conjunto de datos ‘102 Category Flower Dataset’ y la librería de fastai.">
 
-<title>karensanchez777.github.io - Creando un clasificador con 102 Category Flower Dataset</title>
+<title>Creando un clasificador con 102 Category Flower Dataset – karensanchez777.github.io</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,11 +20,12 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -35,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -49,47 +50,17 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -101,17 +72,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-629dcf638af2de93fe5aeade506b5e99.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -120,12 +97,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
@@ -136,36 +115,38 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">karensanchez777.github.io</span>
     </a>
   </div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html">
- <span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -213,6 +194,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+
 <p><strong>Nota</strong>: Para ejecutar las celdas de código de <a href="https://www.kaggle.com/code/karensnchez/flower-classification-with-fastai-and-oxford102">esta notebook</a>, puedes hacerlo en Kaggle seleccionando la opción “Copy &amp; Edit”.</p>
 <p>Este es mi <em>miniproyecto</em> de las lecciones 1 y 2 del curso <a href="https://course.fast.ai/">Practical Deep Learning for Coders part 1</a>.</p>
 <p>En este curso se enfatiza que para sacar el máximo provecho de este tenemos que llevar a cabo miniproyectos en cada lección, ya que, como menciona Jeremy Howard, el profesor, “lo más importante para aprender Deep Learning es escribir código y experimentar”.</p>
@@ -221,7 +203,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>En la primera lección del curso de fast.ai construimos un clasificador de imágenes que distingue entre imágenes de bosques y pájaros. Inspirada en dicho clasificador, decidí crear un clasificador de flores. Así, la próxima vez que vea una flor que me encante pero no sepa su nombre, podré tomarle una foto y preguntarle a mi modelo.</p>
 <p>El conjunto de datos consta de más de 8000 imágenes de 102 tipos de flores comunes en el Reino Unido. La división del conjunto de datos en conjuntos de entrenamiento, validación y prueba, así como las etiquetas, se especifican en archivos de texto, como veremos a continuación.</p>
 <p>Para trabajar en Kaggle tenemos que actualizar la librería de fastai con <code>-Uqq</code>.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:17.446593Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:17.445589Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:29.765381Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:29.764183Z&quot;}" data-papermill="{&quot;duration&quot;:12.339353,&quot;end_time&quot;:&quot;2023-06-21T01:37:29.767801&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:17.428448&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="1">
+<div id="7c991f96" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:17.446593Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:17.445589Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:29.765381Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:29.764183Z&quot;}" data-papermill="{&quot;duration&quot;:12.339353,&quot;end_time&quot;:&quot;2023-06-21T01:37:29.767801&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:17.428448&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>iskaggle <span class="op">=</span> os.environ.get(<span class="st">'KAGGLE_KERNEL_RUN_TYPE'</span>, <span class="st">''</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -236,17 +218,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/4bab8f55-2-52b8138b-6799-4dda-a8a8-3f5fe44c67c8.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">image.png</figcaption><p></p>
+<figcaption>image.png</figcaption>
 </figure>
 </div>
 <p>Para encontrar la ubicación de la función <code>untar_data</code> escribí este término en la barra de búsqueda de GitHub con el filtro <code>repo:fastai/fastai</code>, como se muestra en la imagen de abajo:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/4bab8f55-1-1019b7c2-4b26-46c2-9db5-6770802d01c1.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">image.png</figcaption><p></p>
+<figcaption>image.png</figcaption>
 </figure>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:29.832103Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:29.831764Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:47.243322Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:47.242417Z&quot;}" data-papermill="{&quot;duration&quot;:17.430186,&quot;end_time&quot;:&quot;2023-06-21T01:37:47.245380&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:29.815194&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="2">
+<div id="07caeb4c" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:29.832103Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:29.831764Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:47.243322Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:47.242417Z&quot;}" data-papermill="{&quot;duration&quot;:17.430186,&quot;end_time&quot;:&quot;2023-06-21T01:37:47.245380&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:29.815194&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.data.external <span class="im">import</span> untar_data, URLs</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>path <span class="op">=</span> untar_data(URLs.FLOWERS)</span>
@@ -282,7 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>Observamos que se descargaron 4 cosas: el directorio <code>jpg</code> y tres archivos de texto. Veamos qué información contienen estos últimos:</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:47.310693Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:47.310139Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:48.257606Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:48.256185Z&quot;}" data-papermill="{&quot;duration&quot;:0.967269,&quot;end_time&quot;:&quot;2023-06-21T01:37:48.260576&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:47.293307&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="3">
+<div id="fe957041" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:47.310693Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:47.310139Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:48.257606Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:48.256185Z&quot;}" data-papermill="{&quot;duration&quot;:0.967269,&quot;end_time&quot;:&quot;2023-06-21T01:37:48.260576&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:47.293307&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="st">'/root/.fastai/data/oxford-102-flowers/train.txt'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>jpg/image_03860.jpg 16
@@ -297,7 +279,7 @@ jpg/image_06523.jpg 25
 jpg/image_05517.jpg 86</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:48.296775Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:48.296371Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:49.262659Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:49.261472Z&quot;}" data-papermill="{&quot;duration&quot;:0.986262,&quot;end_time&quot;:&quot;2023-06-21T01:37:49.265176&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:48.278914&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="4">
+<div id="d2f3152d" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:48.296775Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:48.296371Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:49.262659Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:49.261472Z&quot;}" data-papermill="{&quot;duration&quot;:0.986262,&quot;end_time&quot;:&quot;2023-06-21T01:37:49.265176&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:48.278914&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="st">'/root/.fastai/data/oxford-102-flowers/valid.txt'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>jpg/image_04467.jpg 89
@@ -312,7 +294,7 @@ jpg/image_04652.jpg 47
 jpg/image_07083.jpg 66</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:49.300695Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:49.300331Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.257506Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.256276Z&quot;}" data-papermill="{&quot;duration&quot;:0.977698,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.260053&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:49.282355&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="5">
+<div id="97b22de6" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:49.300695Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:49.300331Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.257506Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.256276Z&quot;}" data-papermill="{&quot;duration&quot;:0.977698,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.260053&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:49.282355&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>head <span class="st">'/root/.fastai/data/oxford-102-flowers/test.txt'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>jpg/image_06977.jpg 34
@@ -329,7 +311,7 @@ jpg/image_07216.jpg 6</code></pre>
 </div>
 <p>En cada línea de los archivos de texto tenemos el nombre de una imagen precedido por el directorio <code>jpg</code>, seguido de un espacio en blanco y, finalmente, un número que representa la etiqueta codificada de la imagen. (Más adelante, en lugar de utilizar etiquetas codificadas, utilizaremos los nombres de las flores.) Por lo tanto, estos archivos de texto especifican cómo se realizará la división del conjunto de datos.</p>
 <p>En el directorio <code>jpg</code> se encuentran las imágenes que ocuparemos para entrenar y validar nuestro modelo. Además, este directorio tambien contiene un conjunto de prueba. Veamos cuántas imágenes hay en el directorio <code>jpg</code>.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.326875Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.326492Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.338714Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.337770Z&quot;}" data-papermill="{&quot;duration&quot;:0.031585,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.340676&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.309091&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="6">
+<div id="e408ee02" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.326875Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.326492Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.338714Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.337770Z&quot;}" data-papermill="{&quot;duration&quot;:0.031585,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.340676&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.309091&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(os.listdir(path<span class="op">/</span><span class="st">'jpg'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>8189</code></pre>
@@ -337,68 +319,69 @@ jpg/image_07216.jpg 6</code></pre>
 </div>
 <p>Observamos que tenemos más de 8000 imágenes de flores.</p>
 <p>Podemos convertir los archivos de texto en <code>DataFrame</code>’s de pandas para investigar más acerca de nuestro conjunto de datos. Por ejemplo, ¿cuántas imágenes se usarán para entrenar el modelo?, ¿cuántas se usarán para la validación? Asimismo podemos corroborar que tenemos 102 categorías de flores y averiguar cuántas imágenes hay por categoría. Todo esto se puede hacer rápidamente si convertimos los archivos de texto a <code>DataFrame</code>’s.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.412888Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.412477Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.437862Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.436941Z&quot;}" data-papermill="{&quot;duration&quot;:0.04553,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.439956&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.394426&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="7">
+<div id="aac995d3" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.412888Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.412477Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.437862Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.436941Z&quot;}" data-papermill="{&quot;duration&quot;:0.04553,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.439956&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.394426&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>cols<span class="op">=</span>[<span class="st">'filename'</span>,<span class="st">'label'</span>]</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>train<span class="op">=</span>pd.read_csv(path<span class="op">/</span><span class="st">'train.txt'</span>, sep<span class="op">=</span><span class="st">" "</span>, names<span class="op">=</span>cols)</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>train.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>filename</th>
-      <th>label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>jpg/image_03860.jpg</td>
-      <td>16</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>jpg/image_06092.jpg</td>
-      <td>13</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jpg/image_02400.jpg</td>
-      <td>42</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jpg/image_02852.jpg</td>
-      <td>55</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jpg/image_07710.jpg</td>
-      <td>96</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">filename</th>
+<th data-quarto-table-cell-role="th">label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>jpg/image_03860.jpg</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>jpg/image_06092.jpg</td>
+<td>13</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>jpg/image_02400.jpg</td>
+<td>42</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>jpg/image_02852.jpg</td>
+<td>55</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>jpg/image_07710.jpg</td>
+<td>96</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.474525Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.474196Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.483417Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.482525Z&quot;}" data-papermill="{&quot;duration&quot;:0.029189,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.485741&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.456552&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="8">
+<div id="69793bbc" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.474525Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.474196Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.483417Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.482525Z&quot;}" data-papermill="{&quot;duration&quot;:0.029189,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.485741&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.456552&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El conjunto de entrenamiento cuenta con </span><span class="sc">{</span>train<span class="sc">.</span>filename<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> imágenes."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>El conjunto de entrenamiento cuenta con 1020 imágenes.</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.520836Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.520483Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.527241Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.526269Z&quot;}" data-papermill="{&quot;duration&quot;:0.026644,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.529455&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.502811&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="9">
+<div id="2f2a257a" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.520836Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.520483Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.527241Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.526269Z&quot;}" data-papermill="{&quot;duration&quot;:0.026644,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.529455&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.502811&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de categorías que hay en el conjunto de entrenamiento es </span><span class="sc">{</span>train<span class="sc">.</span>label<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>El número de categorías que hay en el conjunto de entrenamiento es 102.</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.564723Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.563792Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.576527Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.575246Z&quot;}" data-papermill="{&quot;duration&quot;:0.032706,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.578676&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.545970&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="10">
+<div id="698646bc" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.564723Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.563792Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.576527Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.575246Z&quot;}" data-papermill="{&quot;duration&quot;:0.032706,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.578676&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.545970&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de imagenes que hay por categoría es </span><span class="sc">{</span>train<span class="sc">.</span>groupby(<span class="st">'label'</span>)<span class="sc">.</span>filename<span class="sc">.</span>nunique()<span class="sc">.</span>unique()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>El número de imagenes que hay por categoría es [10]</code></pre>
@@ -406,53 +389,54 @@ jpg/image_07216.jpg 6</code></pre>
 </div>
 <p>Lo cual sí cuadra, pues si son 102 categorías cada una con 10 imagenes, eso nos da las 1020 imágenes que hay en el conjunto de entrenamiento.</p>
 <p>Hacemos lo mismo con el conjunto de validación y prueba:</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.648161Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.647283Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.660092Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.658989Z&quot;}" data-papermill="{&quot;duration&quot;:0.032847,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.662136&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.629289&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="11">
+<div id="1857d5de" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.648161Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.647283Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.660092Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.658989Z&quot;}" data-papermill="{&quot;duration&quot;:0.032847,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.662136&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.629289&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>valid<span class="op">=</span>pd.read_csv(path<span class="op">/</span><span class="st">'valid.txt'</span>, sep<span class="op">=</span><span class="st">" "</span>, names<span class="op">=</span>cols)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>valid.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>filename</th>
-      <th>label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>jpg/image_04467.jpg</td>
-      <td>89</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>jpg/image_07129.jpg</td>
-      <td>44</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jpg/image_05166.jpg</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jpg/image_07002.jpg</td>
-      <td>34</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jpg/image_02007.jpg</td>
-      <td>79</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">filename</th>
+<th data-quarto-table-cell-role="th">label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>jpg/image_04467.jpg</td>
+<td>89</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>jpg/image_07129.jpg</td>
+<td>44</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>jpg/image_05166.jpg</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>jpg/image_07002.jpg</td>
+<td>34</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>jpg/image_02007.jpg</td>
+<td>79</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.698920Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.698097Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.706525Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.705254Z&quot;}" data-papermill="{&quot;duration&quot;:0.028561,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.708726&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.680165&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="12">
+<div id="10841bb9" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.698920Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.698097Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.706525Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.705254Z&quot;}" data-papermill="{&quot;duration&quot;:0.028561,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.708726&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.680165&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El conjunto de validación cuenta con </span><span class="sc">{</span>valid<span class="sc">.</span>filename<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> imágenes."</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de categorías que hay en conjunto de validación es </span><span class="sc">{</span>valid<span class="sc">.</span>label<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">."</span>)</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de imagenes que hay por categoría es </span><span class="sc">{</span>valid<span class="sc">.</span>groupby(<span class="st">'label'</span>)<span class="sc">.</span>filename<span class="sc">.</span>nunique()<span class="sc">.</span>unique()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -463,53 +447,54 @@ El número de imagenes que hay por categoría es [10]</code></pre>
 </div>
 </div>
 <p>Observamos que cada una de las categorías se entrena y valida con 10 imágenes.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.778924Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.778074Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.792723Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.791609Z&quot;}" data-papermill="{&quot;duration&quot;:0.034815,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.794755&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.759940&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="13">
+<div id="ebdfc22e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.778924Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.778074Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.792723Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.791609Z&quot;}" data-papermill="{&quot;duration&quot;:0.034815,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.794755&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.759940&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>test_df<span class="op">=</span>pd.read_csv(path<span class="op">/</span><span class="st">'test.txt'</span>, sep<span class="op">=</span><span class="st">" "</span>, names<span class="op">=</span>cols)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>test_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>filename</th>
-      <th>label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>jpg/image_06977.jpg</td>
-      <td>34</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>jpg/image_00800.jpg</td>
-      <td>80</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jpg/image_05038.jpg</td>
-      <td>58</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jpg/image_06759.jpg</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jpg/image_01133.jpg</td>
-      <td>45</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">filename</th>
+<th data-quarto-table-cell-role="th">label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>jpg/image_06977.jpg</td>
+<td>34</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>jpg/image_00800.jpg</td>
+<td>80</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>jpg/image_05038.jpg</td>
+<td>58</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>jpg/image_06759.jpg</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>jpg/image_01133.jpg</td>
+<td>45</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.832120Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.831264Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.843988Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.842408Z&quot;}" data-papermill="{&quot;duration&quot;:0.033181,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.846190&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.813009&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="14">
+<div id="fab921eb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.832120Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.831264Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:50.843988Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:50.842408Z&quot;}" data-papermill="{&quot;duration&quot;:0.033181,&quot;end_time&quot;:&quot;2023-06-21T01:37:50.846190&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.813009&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El conjunto de prueba cuenta con </span><span class="sc">{</span>test_df<span class="sc">.</span>filename<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> imágenes."</span>)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de categorías que hay en conjunto de prueba es </span><span class="sc">{</span>test_df<span class="sc">.</span>label<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">."</span>)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de imagenes que hay por categoría es </span><span class="sc">{</span>test_df<span class="sc">.</span>groupby(<span class="st">'label'</span>)<span class="sc">.</span>filename<span class="sc">.</span>nunique()<span class="sc">.</span>unique()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -539,7 +524,7 @@ El número de imagenes que hay por categoría es [ 20  40  36  45  25  65  26  6
 <p><strong>Advertencia</strong>: Este bloque de código tarda aproximadamente 0.5 h en ejecutarse en mi computadora.</p>
 <p>He optado por eliminar las imágenes del conjunto de prueba en lugar de moverlos a un nuevo directorio, porque la primera opción es mucho más rápida.</p>
 <p><strong>Nota</strong>: El inconveniente de tener que eliminar o mover los datos del conjunto de prueba surge debido al uso de la función <code>get_image_files</code> al crear el<code>DataBlock</code>. Sin embargo, existen otras formas de indicarle a fastai cómo obtener los datos de entrenamiento y validación que no requieren implementar cambios en el directorio <code>jpg</code>. Puedes observar un ejemplo de estas alternativas <a href="https://www.kaggle.com/code/hobaak/flowerdetector-oxford-102-flowers">aquí</a>, donde se utiliza el mismo conjunto de datos que yo he usado.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.958501Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.957575Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:53.784655Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:53.783649Z&quot;}" data-papermill="{&quot;duration&quot;:2.85046,&quot;end_time&quot;:&quot;2023-06-21T01:37:53.787030&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.936570&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="15">
+<div id="460fcedd" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:50.958501Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:50.957575Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:53.784655Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:53.783649Z&quot;}" data-papermill="{&quot;duration&quot;:2.85046,&quot;end_time&quot;:&quot;2023-06-21T01:37:53.787030&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:50.936570&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ocupamos este modulo para usar la clase Path, la función `doc`, etc</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastai.vision.<span class="bu">all</span> <span class="im">import</span> <span class="op">*</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -569,7 +554,7 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    splitter<span class="op">=</span>FuncSplitter(is_valid),</span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    item_tfms<span class="op">=</span>Resize(<span class="dv">460</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Lo primero que le debemos de decir a fastai el tipo de problema que estamos resolviendo, en este caso, clasificación de imagenes, por tanto, el primer parametro del <code>DataBlock</code> es: ## <em>Inputs</em> y <em>outputs</em> del modelo <code>blocks=(ImageBlock, CategoryBlock)</code>: En esta parte indicamos cuál es el <em>input</em> y cuál es <em>output</em>. En este caso, por tratarse de clasificación de imágenes, cuando mi modelo haga predicciones, el input que le voy a dar es una imagen y lo que el modelo me tiene que regresar es la etiqueta o categoría de esta imagen. ## ¿Dónde están los datos? <code>get_items=get_image_files</code>: Aquí le decimos a fastai donde se encuentran los datos, donde hemos utilizado la función <code>get_image_files</code>, que conviene que revisemos un poco qué hace.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:53.893901Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:53.893530Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:53.916295Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:53.915132Z&quot;}" data-papermill="{&quot;duration&quot;:0.043625,&quot;end_time&quot;:&quot;2023-06-21T01:37:53.918685&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:53.875060&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="16">
+<div id="9a2b2cbd" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:53.893901Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:53.893530Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:53.916295Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:53.915132Z&quot;}" data-papermill="{&quot;duration&quot;:0.043625,&quot;end_time&quot;:&quot;2023-06-21T01:37:53.918685&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:53.875060&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>get_image_files(path<span class="op">/</span><span class="st">'jpg'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>(#2040) [Path('/root/.fastai/data/oxford-102-flowers/jpg/image_05046.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_07694.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_07564.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_01324.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_07225.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_04721.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_04855.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_06682.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_00719.jpg'),Path('/root/.fastai/data/oxford-102-flowers/jpg/image_04952.jpg')...]</code></pre>
@@ -578,14 +563,14 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 <p><strong>Nota</strong>: Observemos que le he dado como argumento la dirección donde se encuentran las imágenes, mientras que en mi DataBlock no lo hice. Esto es porque la fuente de los datos la especifico cuando creo los dataloaders, después de crear el <code>DataBlock</code>.</p>
 <p><code>get_image_files</code> extrae las direcciones de todas las imágenes en el folder <code>jpg</code> de forma recursiva, esto es, incluye las de las imágenes en los subfolders, si es que hay. Esta es la razón por la que tuvimos que eliminar las imágenes del conjunto de prueba de este directorio, ya que también serían utilizadas como datos para entrenar nuestro modelo.</p>
 <p>Lo que esta función nos proporciona como <em>items</em> son las direcciones de todas las imagenes que tenemos en el directorio <code>jpg</code> (2040 en total).</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.016169Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.015498Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.026613Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.025366Z&quot;}" data-papermill="{&quot;duration&quot;:0.050649,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.032003&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:53.981354&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="17">
+<div id="a35c8db9" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.016169Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.015498Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.026613Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.025366Z&quot;}" data-papermill="{&quot;duration&quot;:0.050649,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.032003&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:53.981354&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(Path(<span class="st">'/root/.fastai/data/oxford-102-flowers/jpg/image_05046.jpg'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <pre><code>pathlib.PosixPath</code></pre>
 </div>
 </div>
 <p>Obsevamos que el tipo de objeto de cada item es un objeto archivo, <code>pathlib.PosixPath</code>. Este tipo de objetos tienen la propiedad <code>.name</code>, que nos da el último componente de una dirección, esto es, el nombre del archivo. Por ejemplo:</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.119211Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.118895Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.124635Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.123775Z&quot;}" data-papermill="{&quot;duration&quot;:0.026961,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.126517&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.099556&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="18">
+<div id="52cc2566" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.119211Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.118895Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.124635Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.123775Z&quot;}" data-papermill="{&quot;duration&quot;:0.026961,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.126517&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.099556&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>Path(<span class="st">'/root/.fastai/data/oxford-102-flowers/jpg/image_05046.jpg'</span>).name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>'image_05046.jpg'</code></pre>
@@ -595,7 +580,7 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 </section>
 <section id="conjunto-de-validación" class="level2">
 <h2 class="anchored" data-anchor-id="conjunto-de-validación">Conjunto de validación</h2>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.235760Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.235408Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.240465Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.239437Z&quot;}" data-papermill="{&quot;duration&quot;:0.026639,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.242846&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.216207&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="19">
+<div id="a79d263e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.235760Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.235408Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.240465Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.239437Z&quot;}" data-papermill="{&quot;duration&quot;:0.026639,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.242846&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.216207&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> is_valid(x): <span class="cf">return</span> valid[<span class="st">'filename'</span>].<span class="bu">str</span>.contains(x.name).<span class="bu">any</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>La función <code>is_valid</code> se usa para determinar qué <em>items</em> pertencen al conjunto de validación. Recibe como input un objeto archivo. Revisa si en las cadenas de la columna <code>filename</code> del dataframe <code>valid</code>, hay una subcadena que coincide con el nombre del archivo, <code>x.name</code>, por lo que sus resultados son <code>True</code> o <code>False</code>.</p>
@@ -604,7 +589,7 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 <section id="etiquetas" class="level2">
 <h2 class="anchored" data-anchor-id="etiquetas">Etiquetas</h2>
 <p>Lo bueno de computer vision es que podemos ver que tan buenas son las predicciones tan solo con ver la imagen y su predicción, por lo tanto sería de mayor utilidad para hacer esta inspección si tenemos como etiquetas los nombres de las flores, en lugar de etiquetas codificadas.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.389767Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.389057Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.406515Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.405579Z&quot;}" data-papermill="{&quot;duration&quot;:0.038702,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.408757&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.370055&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="20">
+<div id="5505e7d4" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.389767Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.389057Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.406515Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.405579Z&quot;}" data-papermill="{&quot;duration&quot;:0.038702,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.408757&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.370055&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Source: https://www.kaggle.com/datasets/hobaak/oxford-102-flower-name-index</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>flowers_name<span class="op">=</span>pd.read_csv(<span class="st">'/kaggle/input/oxford-102-flower-name-index/oxford_flower_102_name.csv'</span>)</span>
@@ -614,113 +599,115 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 <pre><code>{0: 'pink primrose', 1: 'hard-leaved pocket orchid', 2: 'canterbury bells', 3: 'sweet pea', 4: 'english marigold', 5: 'tiger lily', 6: 'moon orchid', 7: 'bird of paradise', 8: 'monkshood', 9: 'globe thistle', 10: 'snapdragon', 11: "colt's foot", 12: 'king protea', 13: 'spear thistle', 14: 'yellow iris', 15: 'globe-flower', 16: 'purple coneflower', 17: 'peruvian lily', 18: 'balloon flower', 19: 'giant white arum lily', 20: 'fire lily', 21: 'pincushion flower', 22: 'fritillary', 23: 'red ginger', 24: 'grape hyacinth', 25: 'corn poppy', 26: 'prince of wales feathers', 27: 'stemless gentian', 28: 'artichoke', 29: 'sweet william', 30: 'carnation', 31: 'garden phlox', 32: 'love in the mist', 33: 'mexican aster', 34: 'alpine sea holly', 35: 'ruby-lipped cattleya', 36: 'cape flower', 37: 'great masterwort', 38: 'siam tulip', 39: 'lenten rose', 40: 'barbeton daisy', 41: 'daffodil', 42: 'sword lily', 43: 'poinsettia', 44: 'bolero deep blue', 45: 'wallflower', 46: 'marigold', 47: 'buttercup', 48: 'oxeye daisy', 49: 'common dandelion', 50: 'petunia', 51: 'wild pansy', 52: 'primula', 53: 'sunflower', 54: 'pelargonium', 55: 'bishop of llandaff', 56: 'gaura', 57: 'geranium', 58: 'orange dahlia', 59: 'pink-yellow dahlia', 60: 'cautleya spicata', 61: 'japanese anemone', 62: 'black-eyed susan', 63: 'silverbush', 64: 'californian poppy', 65: 'osteospermum', 66: 'spring crocus', 67: 'bearded iris', 68: 'windflower', 69: 'tree poppy', 70: 'gazania', 71: 'azalea', 72: 'water lily', 73: 'rose', 74: 'thorn apple', 75: 'morning glory', 76: 'passion flower', 77: 'lotus lotus', 78: 'toad lily', 79: 'anthurium', 80: 'frangipani', 81: 'clematis', 82: 'hibiscus', 83: 'columbine', 84: 'desert-rose', 85: 'tree mallow', 86: 'magnolia', 87: 'cyclamen', 88: 'watercress', 89: 'canna lily', 90: 'hippeastrum', 91: 'bee balm', 92: 'ball moss', 93: 'foxglove', 94: 'bougainvillea', 95: 'camellia', 96: 'mallow', 97: 'mexican petunia', 98: 'bromelia', 99: 'blanket flower', 100: 'trumpet creeper', 101: 'blackberry lily'}</code></pre>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.446891Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.445219Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.453674Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.452804Z&quot;}" data-papermill="{&quot;duration&quot;:0.029176,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.455615&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.426439&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="21">
+<div id="70ec5703" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.446891Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.445219Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.453674Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.452804Z&quot;}" data-papermill="{&quot;duration&quot;:0.029176,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.455615&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.426439&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>train[<span class="st">'flower_name'</span>]<span class="op">=</span>train[<span class="st">'label'</span>].<span class="bu">map</span>(name_dict)</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>valid[<span class="st">'flower_name'</span>]<span class="op">=</span>valid[<span class="st">'label'</span>].<span class="bu">map</span>(name_dict)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.495265Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.493806Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.504323Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.503281Z&quot;}" data-papermill="{&quot;duration&quot;:0.032599,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.506506&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.473907&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="22">
+<div id="193a9fce" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.495265Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.493806Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.504323Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.503281Z&quot;}" data-papermill="{&quot;duration&quot;:0.032599,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.506506&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.473907&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>train.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>filename</th>
-      <th>label</th>
-      <th>flower_name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>jpg/image_03860.jpg</td>
-      <td>16</td>
-      <td>purple coneflower</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>jpg/image_06092.jpg</td>
-      <td>13</td>
-      <td>spear thistle</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jpg/image_02400.jpg</td>
-      <td>42</td>
-      <td>sword lily</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jpg/image_02852.jpg</td>
-      <td>55</td>
-      <td>bishop of llandaff</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jpg/image_07710.jpg</td>
-      <td>96</td>
-      <td>mallow</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">filename</th>
+<th data-quarto-table-cell-role="th">label</th>
+<th data-quarto-table-cell-role="th">flower_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>jpg/image_03860.jpg</td>
+<td>16</td>
+<td>purple coneflower</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>jpg/image_06092.jpg</td>
+<td>13</td>
+<td>spear thistle</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>jpg/image_02400.jpg</td>
+<td>42</td>
+<td>sword lily</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>jpg/image_02852.jpg</td>
+<td>55</td>
+<td>bishop of llandaff</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>jpg/image_07710.jpg</td>
+<td>96</td>
+<td>mallow</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.544438Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.543823Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.553225Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.552194Z&quot;}" data-papermill="{&quot;duration&quot;:0.030012,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.555305&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.525293&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="23">
+<div id="f52536b1" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.544438Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.543823Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.553225Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.552194Z&quot;}" data-papermill="{&quot;duration&quot;:0.030012,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.555305&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.525293&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>valid.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="23">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>filename</th>
-      <th>label</th>
-      <th>flower_name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>jpg/image_04467.jpg</td>
-      <td>89</td>
-      <td>canna lily</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>jpg/image_07129.jpg</td>
-      <td>44</td>
-      <td>bolero deep blue</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jpg/image_05166.jpg</td>
-      <td>4</td>
-      <td>english marigold</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jpg/image_07002.jpg</td>
-      <td>34</td>
-      <td>alpine sea holly</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jpg/image_02007.jpg</td>
-      <td>79</td>
-      <td>anthurium</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">filename</th>
+<th data-quarto-table-cell-role="th">label</th>
+<th data-quarto-table-cell-role="th">flower_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>jpg/image_04467.jpg</td>
+<td>89</td>
+<td>canna lily</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>jpg/image_07129.jpg</td>
+<td>44</td>
+<td>bolero deep blue</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>jpg/image_05166.jpg</td>
+<td>4</td>
+<td>english marigold</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>jpg/image_07002.jpg</td>
+<td>34</td>
+<td>alpine sea holly</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>jpg/image_02007.jpg</td>
+<td>79</td>
+<td>anthurium</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.594725Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.593987Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.600178Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.599269Z&quot;}" data-papermill="{&quot;duration&quot;:0.027184,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.602228&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.575044&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="24">
+<div id="1c4487e1" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.594725Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.593987Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.600178Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.599269Z&quot;}" data-papermill="{&quot;duration&quot;:0.027184,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.602228&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.575044&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pathlib</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Función que extrae las etiquetas de objetos tipo PosixPath.</span></span>
@@ -733,7 +720,7 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 </div>
 <p><code>assert isinstance(o, pathlib.PosixPath)</code> lo único que hace es corroborar que el input es un objeto <code>pathlib.PosixPath</code>.</p>
 <p><code>get_y= get_flower_name</code>: Le podemos pasar cualquier función a <code>get_y</code> que obtenga la etiqueta de cada item. Por ejemplo, en esta función primero verificamos a qué conjunto de datos pertenece el item, para lo cual buscamos si el nombre del archivo (<code>o.name</code>) es una subcadena de las cadenas en <code>filename</code> del dataframe<code>valid</code> o <code>train</code>. Una vez que sabemos en qué dataframe se encuentra la información de dicho item, lo ubicamos en el dataframe correspondiente y obtenemos el valor de la <code>flower_name</code> para este item.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.677369Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.676534Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.685635Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.684705Z&quot;}" data-papermill="{&quot;duration&quot;:0.029943,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.687583&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.657640&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="25">
+<div id="50be3ccf" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.677369Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.676534Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:37:54.685635Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:37:54.684705Z&quot;}" data-papermill="{&quot;duration&quot;:0.029943,&quot;end_time&quot;:&quot;2023-06-21T01:37:54.687583&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.657640&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>get_flower_name(Path(<span class="st">'/root/.fastai/data/oxford-102-flowers/jpg/image_05046.jpg'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="25">
 <pre><code>'orange dahlia'</code></pre>
@@ -752,7 +739,7 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 <ul>
 <li>Con imágenes pequeñas, se reducen los detalles de las misma, pero requieren menos memoria y recursos, lo que puede acelerar el entrenamiento.</li>
 </ul>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.799126Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.798230Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:01.803063Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:01.802067Z&quot;}" data-papermill="{&quot;duration&quot;:7.027523,&quot;end_time&quot;:&quot;2023-06-21T01:38:01.806090&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.778567&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="26">
+<div id="382a76cc" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:37:54.799126Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:37:54.798230Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:01.803063Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:01.802067Z&quot;}" data-papermill="{&quot;duration&quot;:7.027523,&quot;end_time&quot;:&quot;2023-06-21T01:38:01.806090&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:37:54.778567&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>flowers<span class="op">=</span>DataBlock(</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    blocks<span class="op">=</span>(ImageBlock, CategoryBlock),</span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    get_items<span class="op">=</span>get_image_files,</span>
@@ -764,14 +751,14 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 </div>
 <p>El argumento que le damos a <code>dataloaders</code> es la fuente donde se encuentran las imágenes y <code>bs=32</code>, que significa que el número de imágenes que contiene un batch es 32.</p>
 <p>Para asegurarnos que nuestros dataloaders se formaron correctamente podemos verificar el número de datos que hay en cada dataloader, con esto además verificamos si nuestra función para dividir el conjunto de datos trabaja de acuerdo a lo esperado.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:01.895492Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:01.895103Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:01.902628Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:01.901442Z&quot;}" data-papermill="{&quot;duration&quot;:0.030354,&quot;end_time&quot;:&quot;2023-06-21T01:38:01.904633&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:01.874279&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="27">
+<div id="51ce832f" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:01.895492Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:01.895103Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:01.902628Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:01.901442Z&quot;}" data-papermill="{&quot;duration&quot;:0.030354,&quot;end_time&quot;:&quot;2023-06-21T01:38:01.904633&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:01.874279&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de batches en el dataloader de validación es: </span><span class="sc">{</span><span class="bu">len</span>(dls.valid)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>El número de batches en el dataloader de validación es: 32</code></pre>
 </div>
 </div>
 <p>Este resultado es el número de batches que hay en el dataloader de validación. Recordemos que en cada batch tenemos 32 imágenes (<code>bs=32</code>). Por lo tanto, en el conjunto de validación tenemos 32x32=1024 datos.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:01.983721Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:01.982835Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:01.988702Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:01.987259Z&quot;}" data-papermill="{&quot;duration&quot;:0.027918,&quot;end_time&quot;:&quot;2023-06-21T01:38:01.990873&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:01.962955&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="28">
+<div id="377eef47" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:01.983721Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:01.982835Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:01.988702Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:01.987259Z&quot;}" data-papermill="{&quot;duration&quot;:0.027918,&quot;end_time&quot;:&quot;2023-06-21T01:38:01.990873&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:01.962955&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El número de batches en el conjunto de entrenamiento es: </span><span class="sc">{</span><span class="bu">len</span>(dls.train)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>El número de batches en el conjunto de entrenamiento es: 31</code></pre>
@@ -782,10 +769,14 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 <p>Respecto a las imágenes que no están siendo utilizadas me pregunto cómo podremos saber a qué categoría pertenecen, si es una imagen por categoría o si se han quitado todas las imágenes de más de dos categorías (recordemos que cada categoría se entrena con 10 imágenes). Esto es importante porque debido a esta disminución de datos el modelo podría tener poca confianza en las predicciones de algunas categorías.</p>
 <p><strong>Consejo</strong>: Tenemos que elegir un tamaño de batch que emplee la mayoría, sino todas, las imágenes. En mi caso, funcionaría cualquier divisor de 1020 (por ejemplo, 30).</p>
 <p>También podemos inspeccionar que nuestra función para etiquetar imágenes y que el diccionario que mapea los índices con el nombre de las flores están trabajando correctamente mostrando un batch, como sigue:</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:02.111725Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:02.111387Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:05.251833Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:05.250621Z&quot;}" data-papermill="{&quot;duration&quot;:3.176631,&quot;end_time&quot;:&quot;2023-06-21T01:38:05.268003&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:02.091372&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="29">
+<div id="99542e37" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:02.111725Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:02.111387Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:05.251833Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:05.250621Z&quot;}" data-papermill="{&quot;duration&quot;:3.176631,&quot;end_time&quot;:&quot;2023-06-21T01:38:05.268003&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:02.091372&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>dls.show_batch(max_n<span class="op">=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/cell-30-output-1.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Con una búsqueda rapida en la web podemos verificar que las flores que se muestran arriba coinciden con el nombre que se les da. Por lo que alcance a ver, todo marcha bien.</p>
@@ -794,7 +785,7 @@ Ahora el directorio jpg solo cuenta con 2040 imágenes</code></pre>
 </section>
 <section id="entrenamiento-del-modelo" class="level1">
 <h1>Entrenamiento del modelo</h1>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:05.491202Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:05.490835Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:07.431877Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:07.430870Z&quot;}" data-papermill="{&quot;duration&quot;:1.983722,&quot;end_time&quot;:&quot;2023-06-21T01:38:07.434283&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:05.450561&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="30">
+<div id="5cc20dc1" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:05.491202Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:05.490835Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:38:07.431877Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:38:07.430870Z&quot;}" data-papermill="{&quot;duration&quot;:1.983722,&quot;end_time&quot;:&quot;2023-06-21T01:38:07.434283&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:05.450561&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>learn <span class="op">=</span> vision_learner(dls, resnet18, metrics<span class="op">=</span>error_rate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/conda/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
@@ -818,7 +809,7 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 <h2 class="anchored" data-anchor-id="modelos-preentrenados">Modelos preentrenados</h2>
 <p>Son modelos que han sido entrenados en conjuntos de datos enormes, como ImageNet, que contiene más de 1 millón de imágenes de alrededor de 1000 categorías diferentes. Podemos aprovechar el conocimiento general que han adquirido, por ejemplo, para modelos preentrenados en imágenes, podemos beneficiarnos de su capacidad para reconocer patrones y características visuales en tareas similares a aquellas para las que fueron originalmente entrenados. Esto nos ahorra el tiempo que tomaría entrenar una red neuronal desde cero. Además, otra gran ventaja es que para personalizar el modelo preentrenado para nuestro problema no se requiere una cantidad tan grande de datos. Por ejemplo, en <a href="https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data/notebook">Is it bird?</a> se usaron ¡30 imágenes para cada categoría!</p>
 <p>El modelo preentrenado que estamos usando, <code>resnet18</code>, fue entrenado para resolver una tarea similiar, aunque no exactamente igual a la nuestra, ya que ambas implican clasificación de imágenes. Dado que el modelo preentrenado fue entrenado para realizar una tarea diferente a la que estamos abordando, necesitamos aplicar una técnica conocida como <em>transfer learning</em> para adaptar el modelo preentrenado a nuestra tarea específica.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:07.751788Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:07.751232Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:04.033598Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:04.032489Z&quot;}" data-papermill="{&quot;duration&quot;:356.324858,&quot;end_time&quot;:&quot;2023-06-21T01:44:04.035756&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:07.710898&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="31">
+<div id="9f0b08fd" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:38:07.751788Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:38:07.751232Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:04.033598Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:04.032489Z&quot;}" data-papermill="{&quot;duration&quot;:356.324858,&quot;end_time&quot;:&quot;2023-06-21T01:44:04.035756&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:38:07.710898&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>learn.fine_tune(<span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
@@ -839,26 +830,25 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 </style>
 </div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>5.644185</td>
-      <td>2.874754</td>
-      <td>0.652941</td>
-      <td>00:25</td>
-    </tr>
-  </tbody>
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">error_rate</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>5.644185</td>
+<td>2.874754</td>
+<td>0.652941</td>
+<td>00:25</td>
+</tr>
+</tbody>
 </table>
 </div>
 <div class="cell-output cell-output-display">
@@ -880,124 +870,123 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 </style>
 </div>
 <div class="cell-output cell-output-display">
-
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>3.068787</td>
-      <td>2.352395</td>
-      <td>0.528431</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2.514914</td>
-      <td>1.718902</td>
-      <td>0.372549</td>
-      <td>00:21</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1.851037</td>
-      <td>1.191888</td>
-      <td>0.253922</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1.279319</td>
-      <td>0.913255</td>
-      <td>0.201961</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>0.841372</td>
-      <td>0.735211</td>
-      <td>0.152941</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>0.554581</td>
-      <td>0.648134</td>
-      <td>0.140196</td>
-      <td>00:21</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>0.365206</td>
-      <td>0.595047</td>
-      <td>0.138235</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>0.244178</td>
-      <td>0.561940</td>
-      <td>0.124510</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>0.166631</td>
-      <td>0.528423</td>
-      <td>0.122549</td>
-      <td>00:21</td>
-    </tr>
-    <tr>
-      <td>9</td>
-      <td>0.114712</td>
-      <td>0.517312</td>
-      <td>0.120588</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>10</td>
-      <td>0.087335</td>
-      <td>0.492507</td>
-      <td>0.111765</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>11</td>
-      <td>0.063537</td>
-      <td>0.481973</td>
-      <td>0.109804</td>
-      <td>00:21</td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>0.056369</td>
-      <td>0.477516</td>
-      <td>0.112745</td>
-      <td>00:21</td>
-    </tr>
-    <tr>
-      <td>13</td>
-      <td>0.047275</td>
-      <td>0.475519</td>
-      <td>0.115686</td>
-      <td>00:22</td>
-    </tr>
-    <tr>
-      <td>14</td>
-      <td>0.043560</td>
-      <td>0.477489</td>
-      <td>0.114706</td>
-      <td>00:21</td>
-    </tr>
-  </tbody>
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">error_rate</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>3.068787</td>
+<td>2.352395</td>
+<td>0.528431</td>
+<td>00:22</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2.514914</td>
+<td>1.718902</td>
+<td>0.372549</td>
+<td>00:21</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1.851037</td>
+<td>1.191888</td>
+<td>0.253922</td>
+<td>00:22</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.279319</td>
+<td>0.913255</td>
+<td>0.201961</td>
+<td>00:22</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.841372</td>
+<td>0.735211</td>
+<td>0.152941</td>
+<td>00:22</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>0.554581</td>
+<td>0.648134</td>
+<td>0.140196</td>
+<td>00:21</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0.365206</td>
+<td>0.595047</td>
+<td>0.138235</td>
+<td>00:22</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>0.244178</td>
+<td>0.561940</td>
+<td>0.124510</td>
+<td>00:22</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>0.166631</td>
+<td>0.528423</td>
+<td>0.122549</td>
+<td>00:21</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>0.114712</td>
+<td>0.517312</td>
+<td>0.120588</td>
+<td>00:22</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.087335</td>
+<td>0.492507</td>
+<td>0.111765</td>
+<td>00:22</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>0.063537</td>
+<td>0.481973</td>
+<td>0.109804</td>
+<td>00:21</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>0.056369</td>
+<td>0.477516</td>
+<td>0.112745</td>
+<td>00:21</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>0.047275</td>
+<td>0.475519</td>
+<td>0.115686</td>
+<td>00:22</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td>0.043560</td>
+<td>0.477489</td>
+<td>0.114706</td>
+<td>00:21</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -1015,7 +1004,7 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 <p>2.2 Durante epochs solicitados, actualiza los pesos, especialmente los de la cabeza, mientras que los pesos de las capas iniciales casi no ocurre ningún cambio.</p></li>
 </ol>
 <p>Veamos qué tan bien lo hizo nuestro modelo con la matriz de confusión.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:44:04.278323Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:44:04.277927Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:50.028455Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:50.027476Z&quot;}" data-papermill="{&quot;duration&quot;:45.851565,&quot;end_time&quot;:&quot;2023-06-21T01:44:50.084927&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:44:04.233362&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="32">
+<div id="1fe3087d" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:44:04.278323Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:44:04.277927Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:50.028455Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:50.027476Z&quot;}" data-papermill="{&quot;duration&quot;:45.851565,&quot;end_time&quot;:&quot;2023-06-21T01:44:50.084927&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:44:04.233362&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>interp <span class="op">=</span> ClassificationInterpretation.from_learner(learn)</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>interp.plot_confusion_matrix(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">15</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -1061,7 +1050,11 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/cell-33-output-5.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/cell-33-output-5.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -1072,7 +1065,7 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 <p>El aspecto de la matriz de confusión de arriba indica que vamos por buen camino. Una matriz de confusión ideal tendría una diagonal en azul oscuro y los demás cuadritos en blanco, lo que significaría que nuestra precisión es del 100 %.</p>
 <p>La matriz de confusión nos ayuda a identificar las categorías en las que nuestro modelo está teniendo problemas para predecir y en las que predice correctamente con facilidad. Por ejemplo, podemos observar algunas categorías donde el modelo predijo correctamente 10/10 imágenes, pero también observamos otras en azul claro donde se predijo solo 5/10. Por ende, aún hay margen para mejorar nuestros resultados.</p>
 <p>Otra forma de ver donde está teniendo problemas nuestro modelo es viendo cuáles son las mayores pérdidas:</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:44:50.274462Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:44:50.273483Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:51.944618Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:51.943624Z&quot;}" data-papermill="{&quot;duration&quot;:1.723488,&quot;end_time&quot;:&quot;2023-06-21T01:44:51.948689&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:44:50.225201&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="33">
+<div id="01666395" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:44:50.274462Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:44:50.273483Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:51.944618Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:51.943624Z&quot;}" data-papermill="{&quot;duration&quot;:1.723488,&quot;end_time&quot;:&quot;2023-06-21T01:44:51.948689&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:44:50.225201&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>interp.plot_top_losses(<span class="dv">10</span>, nrows<span class="op">=</span><span class="dv">3</span>,figsize<span class="op">=</span>(<span class="dv">17</span>,<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
@@ -1096,7 +1089,11 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/cell-34-output-3.png" class="img-fluid"></p>
+<div>
+<figure class="figure">
+<p><img src="Flower-Classification-with-fastai-and-Oxford102_files/figure-html/cell-34-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Las pérdidas son grandes cuando el modelo predijo incorrectamente, cuando además de predecir incorrectamente estaba muy seguro (probabilidad alta) de su respuesta o cuando predijo correctamente pero con poca seguridad (probabilidad baja).</p>
@@ -1104,7 +1101,7 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 <section id="predicciones" class="level1">
 <h1>Predicciones</h1>
 <p>Para usar este modelo, recodermos que debemos estar en el modo “Edit” en Kaggle. Así, al ejecutar la celda siguiente, nos aparecerá el botón “Upload” para que puedas subir una foto de la flor que desees y el modelo pueda adivinar su nombre.</p>
-<div class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:44:52.260314Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:44:52.259189Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:52.270360Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:52.269509Z&quot;}" data-papermill="{&quot;duration&quot;:0.066971,&quot;end_time&quot;:&quot;2023-06-21T01:44:52.272345&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:44:52.205374&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="34">
+<div id="9001f115" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2023-06-21T01:44:52.260314Z&quot;,&quot;iopub.status.busy&quot;:&quot;2023-06-21T01:44:52.259189Z&quot;,&quot;iopub.status.idle&quot;:&quot;2023-06-21T01:44:52.270360Z&quot;,&quot;shell.execute_reply&quot;:&quot;2023-06-21T01:44:52.269509Z&quot;}" data-papermill="{&quot;duration&quot;:0.066971,&quot;end_time&quot;:&quot;2023-06-21T01:44:52.272345&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2023-06-21T01:44:52.205374&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ipywidgets <span class="im">as</span> widgets</span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display</span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1112,7 +1109,7 @@ Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /roo
 <span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>uploader</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"4d1fde8b25134a4285776391486688d8","version_major":2,"version_minor":0}
+{"model_id":"4d1fde8b25134a4285776391486688d8","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1156,12 +1153,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
     }
-  });
-  clipboard.on('success', function(e) {
+    return false;
+  }
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1193,11 +1193,48 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/karensanchez777\.github\.io\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1207,8 +1244,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1220,9 +1266,244 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1263,6 +1544,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 

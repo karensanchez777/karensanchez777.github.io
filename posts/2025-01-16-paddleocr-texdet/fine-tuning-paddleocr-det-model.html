@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Karen Sánchez">
+<meta name="dcterms.date" content="2025-01-16">
+<meta name="description" content="We will learn how to fine-tune a PaddleOCR text detection model and to make inference with the fine-tuned model.">
+
+<title>Fine-tuning PaddleOCR’s text detection models – karensanchez777.github.io</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-629dcf638af2de93fe5aeade506b5e99.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">karensanchez777.github.io</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Fine-tuning PaddleOCR’s text detection models</h1>
+                  <div>
+        <div class="description">
+          We will learn how to fine-tune a PaddleOCR text detection model and to make inference with the fine-tuned model.
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Karen Sánchez </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 16, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>We’ll cover the following steps to fine-tune text detection models of PaddleOCR and to make inference with our fine-tuned model.</p>
+<ol type="1">
+<li>Clone the PaddleOCR GitHub repository</li>
+<li>Install the framework PaddlePaddle, the gpu version</li>
+<li>Install the package PaddleOCR</li>
+<li>Get the data</li>
+<li>Get the pretrained model</li>
+<li>Train and evaluate the model</li>
+<li>Make inference on new images</li>
+</ol>
+<p>First, we need to clone the GitHub repository of PaddleOCR.</p>
+<p>::: {#4507debf .cell _cell_guid=‘b1076dfc-b9ad-4769-8c92-a6c4dae69d19’ _uuid=‘8f2839f25d086af736a60e9eeb907d3b93b6e0e5’ execution=‘{“iopub.execute_input”:“2024-11-03T04:29:35.054875Z”,“iopub.status.busy”:“2024-11-03T04:29:35.054536Z”,“iopub.status.idle”:“2024-11-03T04:29:54.286380Z”,“shell.execute_reply”:“2024-11-03T04:29:54.285307Z”}’ papermill=‘{“duration”:19.242856,“end_time”:“2024-11-03T04:29:54.288700”,“exception”:false,“start_time”:“2024-11-03T04:29:35.045844”,“status”:“completed”}’ tags=‘[]’ execution_count=1}</p>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>git clone https:<span class="op">//</span>github.com<span class="op">/</span>PaddlePaddle<span class="op">/</span>PaddleOCR.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cloning into 'PaddleOCR'...
+remote: Enumerating objects: 58565, done.
+remote: Counting objects: 100% (7635/7635), done.
+remote: Compressing objects: 100% (1701/1701), done.
+remote: Total 58565 (delta 6225), reused 7240 (delta 5932), pack-reused 50930 (from 1)
+Receiving objects: 100% (58565/58565), 421.89 MiB | 38.83 MiB/s, done.
+Resolving deltas: 100% (41900/41900), done.
+Updating files: 100% (2401/2401), done.</code></pre>
+</div>
+<p>:::</p>
+<p>Next, we have to install the gpu version of PaddlePaddle, the core deep learning framework needed to run PaddleOCR. You may want consult the <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/58e876d38d92b722f527946954c12231cd7ef7c6/doc/doc_en/quickstart_en.md">PaddleOCR Quick Start</a>.</p>
+<div id="441c840b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:29:54.356410Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:29:54.356077Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:25.087347Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:25.086246Z&quot;}" data-papermill="{&quot;duration&quot;:150.751112,&quot;end_time&quot;:&quot;2024-11-03T04:32:25.089910&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:29:54.338798&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python <span class="op">-</span>m pip install <span class="op">-</span>q paddlepaddle<span class="op">-</span>gpu<span class="op">==</span><span class="fl">2.5.0</span>.post118 <span class="op">-</span>f https:<span class="op">//</span>www.paddlepaddle.org.cn<span class="op">/</span>whl<span class="op">/</span>linux<span class="op">/</span>mkl<span class="op">/</span>avx<span class="op">/</span>stable.html</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q <span class="st">"paddleocr&gt;=2.0.1"</span> <span class="co"># Recommend to use version 2.0.1+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q imutils</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q gdown</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+bigframes 0.22.0 requires google-cloud-bigquery[bqstorage,pandas]&gt;=3.10.0, but you have google-cloud-bigquery 2.34.4 which is incompatible.
+bigframes 0.22.0 requires google-cloud-storage&gt;=2.0.0, but you have google-cloud-storage 1.44.0 which is incompatible.
+bigframes 0.22.0 requires pandas&lt;2.1.4,&gt;=1.5.0, but you have pandas 2.2.2 which is incompatible.
+cesium 0.12.3 requires numpy&lt;3.0,&gt;=2.0, but you have numpy 1.26.4 which is incompatible.
+dataproc-jupyter-plugin 0.1.79 requires pydantic~=1.10.0, but you have pydantic 2.9.2 which is incompatible.</code></pre>
+</div>
+</div>
+<p>We’re going to verify that our gpu paddle installation succeed with:</p>
+<div id="5a6f0a6c" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:25.158807Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:25.158205Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:27.018590Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:27.017480Z&quot;}" data-papermill="{&quot;duration&quot;:1.880648,&quot;end_time&quot;:&quot;2024-11-03T04:32:27.020755&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:25.140107&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> paddle</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>gpu_available  <span class="op">=</span> paddle.device.is_compiled_with_cuda()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"GPU available:"</span>, gpu_available)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>GPU available: True</code></pre>
+</div>
+</div>
+<div id="6f369a76" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:27.056843Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:27.056370Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:33.513469Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:33.512255Z&quot;}" data-papermill="{&quot;duration&quot;:6.476633,&quot;end_time&quot;:&quot;2024-11-03T04:32:33.515644&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:27.039011&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>paddle.utils.run_check()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running verify PaddlePaddle program ... </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>I1103 04:32:27.085585    24 interpretercore.cc:237] New Executor is Running.
+W1103 04:32:27.086083    24 gpu_resources.cc:119] Please NOTE: device: 0, GPU Compute Capability: 7.5, Driver API Version: 12.4, Runtime API Version: 11.8
+W1103 04:32:27.096534    24 gpu_resources.cc:149] device: 0, cuDNN Version: 90.0.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PaddlePaddle works well on 1 GPU.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>I1103 04:32:27.534034    24 interpreter_util.cc:518] Standalone Executor is Used.
+======================= Modified FLAGS detected =======================
+FLAGS(name='FLAGS_selected_gpus', current_value='1', default_value='')
+=======================================================================
+I1103 04:32:29.146459    96 tcp_utils.cc:107] Retry to connect to 127.0.0.1:55075 while the server is not yet listening.
+======================= Modified FLAGS detected =======================
+FLAGS(name='FLAGS_selected_gpus', current_value='0', default_value='')
+=======================================================================
+I1103 04:32:29.154580    95 tcp_utils.cc:181] The server starts to listen on IP_ANY:55075
+I1103 04:32:29.154767    95 tcp_utils.cc:130] Successfully connected to 127.0.0.1:55075
+I1103 04:32:32.146667    96 tcp_utils.cc:130] Successfully connected to 127.0.0.1:55075
+W1103 04:32:32.375649    95 gpu_resources.cc:119] Please NOTE: device: 0, GPU Compute Capability: 7.5, Driver API Version: 12.4, Runtime API Version: 11.8
+W1103 04:32:32.376672    95 gpu_resources.cc:149] device: 0, cuDNN Version: 90.0.
+W1103 04:32:32.415951    96 gpu_resources.cc:119] Please NOTE: device: 1, GPU Compute Capability: 7.5, Driver API Version: 12.4, Runtime API Version: 11.8
+W1103 04:32:32.416882    96 gpu_resources.cc:149] device: 1, cuDNN Version: 90.0.
+I1103 04:32:33.151151   113 tcp_store.cc:273] receive shutdown event and so quit from MasterDaemon run loop</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PaddlePaddle works well on 2 GPUs.
+PaddlePaddle is installed successfully! Let's start deep learning with PaddlePaddle now.</code></pre>
+</div>
+</div>
+<div id="3cea29ec" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:33.552065Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:33.551765Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:33.560015Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:33.559173Z&quot;}" data-papermill="{&quot;duration&quot;:0.028212,&quot;end_time&quot;:&quot;2024-11-03T04:32:33.561874&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:33.533662&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>paddle.ones([<span class="dv">3</span>,<span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>Tensor(shape=[3, 3], dtype=float32, place=Place(gpu:0), stop_gradient=True,
+       [[1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.]])</code></pre>
+</div>
+</div>
+<p>As we can see, our gpu version of paddle is functioning.</p>
+<p>It might be useful to know that sometimes the above installation is unsuccessful, arising the following warning when running <code>paddle.utils.run_check()</code>:</p>
+<pre><code>The GPU architecture in your current machine is Pascal, which is not compatible with Paddle installation with arch: 70 75 80 86 , it is recommended to install the corresponding wheel package according to the installation information on the official Paddle website.</code></pre>
+<p>If that happens to you, you could find a lower version of <code>paddlepaddle</code> that works out for your gpu in <a href="https://www.paddlepaddle.org.cn/whl/windows/mkl/avx/stable.html">this webpage</a>, where you can download the whl files. Try with different versions until you find the one that is compatible with your system,as someone shows us <a href="https://blog.csdn.net/qq_37085158/article/details/132598829">here</a>. It is not reccomended to use the latest version, but a stable one.</p>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The data</h2>
+<p>The annotations for PaddleOCR text detection models need to adhere to the next format, as indicated in the <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/dataset/ocr_datasets_en.md">documentation</a>, and must be .txt files, one for training and the other for evaluation:</p>
+<pre><code>" Image file name             Image annotation information encoded by json.dumps"
+ch4_test_images/img_61.jpg    [{"transcription": "MASA", "points": [[310, 104], [416, 141], [418, 216], [312, 179]]}, {...}]</code></pre>
+<ul>
+<li><code>points</code> are the coordinates of the bounding box.<br>
+</li>
+<li><code>transcription</code> is the label of the bounding box.</li>
+</ul>
+<p>We’ll fine-tune a detection model on a dataset of curved text called SCUT-CTW1500, and it turns out we are lucky because the annotations with the required format are provided by PaddleOCR! You can download them <a href="https://paddleocr.bj.bcebos.com/dataset/ctw1500.zip">here</a>.</p>
+<p>Note: <code>transcription</code> in the dataset provided by PaddleOCR is set to <code>0</code> for all bounding box instead of containing the actual text of its bounding box, but since we’re focusing on a detection task rather than recognition, it doesn’t matter.</p>
+</section>
+<section id="the-pretrained-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-pretrained-model">The pretrained model</h2>
+<p>PaddleOCR’s detection model supports 3 backbones (please refer to the <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/detection_en.md">detection models documentation</a>): 1. MobileNetV3 2. Resnet18_vd 3. Resnet50_vd</p>
+<p>It means that the model uses one of these architectures as a feature extractor, with layers trained to identify hierarchical patterns in images.</p>
+<p>There are many algorithms of text detection included in PaddleOCR, for example, <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/algorithm_det_db_en.md">DBNet</a>, <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/algorithm_det_sast_en.md">SAST</a>, <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/algorithm_det_east_en.md">EAST</a>, etc.</p>
+<p>We’ll employ the model PP-OCRv3, regarded as the best model of PaddleOCR because of its precision and generalization capabilities, as mentioned on the <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/finetune_en.md">fine-tune</a> guide in the docs.</p>
+<ul>
+<li>Download the .tar file from this <a href="https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_distill_train.tar">download link</a>.</li>
+<li>Extract the files in the .tar file, where you’ll find <code>student.pdparams</code>, which will served us as our pretrained model.</li>
+</ul>
+<p>The next step is to get <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/configs/det/ch_PP-OCRv3/ch_PP-OCRv3_det_student.yml">the matching configuration file</a> for the student model.</p>
+</section>
+<section id="the-configuration-file" class="level2">
+<h2 class="anchored" data-anchor-id="the-configuration-file">The configuration file</h2>
+<p>This is going to be the configuration we will utilize with our pretrained model.</p>
+<div id="8ed8414e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:33.700984Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:33.700670Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:33.709241Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:33.708503Z&quot;}" data-papermill="{&quot;duration&quot;:0.028523,&quot;end_time&quot;:&quot;2024-11-03T04:32:33.711121&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:33.682598&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>TXT <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="st">Global:</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="st">  debug: false</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="st">  use_gpu: true</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="st">  epoch_num: 9</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">  log_smooth_window: 20</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="st">  print_batch_step: 10</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">  save_model_dir: ./output/ch_PP-OCR_V3_det/</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="st">  save_epoch_step: 100</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="st">  eval_batch_step:</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="st">  - 0</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="st">  - 400</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="st">  cal_metric_during_train: false</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="st">  pretrained_model: /kaggle/input/ch-pp-ocrv3-det-distill-train/student.pdparams</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="st">  checkpoints: null</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="st">  save_inference_dir: null</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="st">  use_visualdl: false</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="st">  infer_img: doc/imgs_en/img_10.jpg</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="st">  save_res_path: ./checkpoints/det_db/predicts_db.txt</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="st">  distributed: true</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="st">Architecture:</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="st">  model_type: det</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="st">  algorithm: DB</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="st">  Transform:</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="st">  Backbone:</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="st">    name: MobileNetV3</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="st">    scale: 0.5</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="st">    model_name: large</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="st">    disable_se: True</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="st">  Neck:</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="st">    name: RSEFPN</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="st">    out_channels: 96</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="st">    shortcut: True</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a><span class="st">  Head:</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="st">    name: DBHead</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a><span class="st">    k: 50</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a><span class="st">Loss:</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="st">  name: DBLoss</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a><span class="st">  balance_loss: true</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="st">  main_loss_type: DiceLoss</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a><span class="st">  alpha: 5</span></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a><span class="st">  beta: 10</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a><span class="st">  ohem_ratio: 3</span></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a><span class="st">Optimizer:</span></span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a><span class="st">  name: Adam</span></span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a><span class="st">  beta1: 0.9</span></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a><span class="st">  beta2: 0.999</span></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a><span class="st">  lr:</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a><span class="st">    name: Cosine</span></span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a><span class="st">    learning_rate: 0.0001</span></span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a><span class="st">    warmup_epoch: 2</span></span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a><span class="st">  regularizer:</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a><span class="st">    name: L2</span></span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a><span class="st">    factor: 5.0e-05</span></span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a><span class="st">PostProcess:</span></span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a><span class="st">  name: DBPostProcess</span></span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a><span class="st">  thresh: 0.3</span></span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a><span class="st">  box_thresh: 0.6</span></span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a><span class="st">  max_candidates: 1000</span></span>
+<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a><span class="st">  unclip_ratio: 1.5</span></span>
+<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a><span class="st">Metric:</span></span>
+<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a><span class="st">  name: DetMetric</span></span>
+<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a><span class="st">  main_indicator: hmean</span></span>
+<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a><span class="st">Train:</span></span>
+<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a><span class="st">  dataset:</span></span>
+<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a><span class="st">    name: SimpleDataSet</span></span>
+<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a><span class="st">    data_dir: /kaggle/input/scutctw1500-datasets/</span></span>
+<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a><span class="st">    label_file_list:</span></span>
+<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a><span class="st">      - /kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/training.txt</span></span>
+<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a><span class="st">    ratio_list: [1.0]</span></span>
+<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a><span class="st">    transforms:</span></span>
+<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a><span class="st">    - DecodeImage:</span></span>
+<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a><span class="st">        img_mode: BGR</span></span>
+<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a><span class="st">        channel_first: false</span></span>
+<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a><span class="st">    - DetLabelEncode: null</span></span>
+<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a><span class="st">    - IaaAugment:</span></span>
+<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a><span class="st">        augmenter_args:</span></span>
+<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a><span class="st">        - type: Fliplr</span></span>
+<span id="cb17-81"><a href="#cb17-81" aria-hidden="true" tabindex="-1"></a><span class="st">          args:</span></span>
+<span id="cb17-82"><a href="#cb17-82" aria-hidden="true" tabindex="-1"></a><span class="st">            p: 0.5</span></span>
+<span id="cb17-83"><a href="#cb17-83" aria-hidden="true" tabindex="-1"></a><span class="st">        - type: Affine</span></span>
+<span id="cb17-84"><a href="#cb17-84" aria-hidden="true" tabindex="-1"></a><span class="st">          args:</span></span>
+<span id="cb17-85"><a href="#cb17-85" aria-hidden="true" tabindex="-1"></a><span class="st">            rotate:</span></span>
+<span id="cb17-86"><a href="#cb17-86" aria-hidden="true" tabindex="-1"></a><span class="st">            - -10</span></span>
+<span id="cb17-87"><a href="#cb17-87" aria-hidden="true" tabindex="-1"></a><span class="st">            - 10</span></span>
+<span id="cb17-88"><a href="#cb17-88" aria-hidden="true" tabindex="-1"></a><span class="st">        - type: Resize</span></span>
+<span id="cb17-89"><a href="#cb17-89" aria-hidden="true" tabindex="-1"></a><span class="st">          args:</span></span>
+<span id="cb17-90"><a href="#cb17-90" aria-hidden="true" tabindex="-1"></a><span class="st">            size:</span></span>
+<span id="cb17-91"><a href="#cb17-91" aria-hidden="true" tabindex="-1"></a><span class="st">            - 0.5</span></span>
+<span id="cb17-92"><a href="#cb17-92" aria-hidden="true" tabindex="-1"></a><span class="st">            - 3</span></span>
+<span id="cb17-93"><a href="#cb17-93" aria-hidden="true" tabindex="-1"></a><span class="st">    - EastRandomCropData:</span></span>
+<span id="cb17-94"><a href="#cb17-94" aria-hidden="true" tabindex="-1"></a><span class="st">        size:</span></span>
+<span id="cb17-95"><a href="#cb17-95" aria-hidden="true" tabindex="-1"></a><span class="st">        - 960</span></span>
+<span id="cb17-96"><a href="#cb17-96" aria-hidden="true" tabindex="-1"></a><span class="st">        - 960</span></span>
+<span id="cb17-97"><a href="#cb17-97" aria-hidden="true" tabindex="-1"></a><span class="st">        max_tries: 50</span></span>
+<span id="cb17-98"><a href="#cb17-98" aria-hidden="true" tabindex="-1"></a><span class="st">        keep_ratio: true</span></span>
+<span id="cb17-99"><a href="#cb17-99" aria-hidden="true" tabindex="-1"></a><span class="st">    - MakeBorderMap:</span></span>
+<span id="cb17-100"><a href="#cb17-100" aria-hidden="true" tabindex="-1"></a><span class="st">        shrink_ratio: 0.4</span></span>
+<span id="cb17-101"><a href="#cb17-101" aria-hidden="true" tabindex="-1"></a><span class="st">        thresh_min: 0.3</span></span>
+<span id="cb17-102"><a href="#cb17-102" aria-hidden="true" tabindex="-1"></a><span class="st">        thresh_max: 0.7</span></span>
+<span id="cb17-103"><a href="#cb17-103" aria-hidden="true" tabindex="-1"></a><span class="st">    - MakeShrinkMap:</span></span>
+<span id="cb17-104"><a href="#cb17-104" aria-hidden="true" tabindex="-1"></a><span class="st">        shrink_ratio: 0.4</span></span>
+<span id="cb17-105"><a href="#cb17-105" aria-hidden="true" tabindex="-1"></a><span class="st">        min_text_size: 8</span></span>
+<span id="cb17-106"><a href="#cb17-106" aria-hidden="true" tabindex="-1"></a><span class="st">    - NormalizeImage:</span></span>
+<span id="cb17-107"><a href="#cb17-107" aria-hidden="true" tabindex="-1"></a><span class="st">        scale: 1./255.</span></span>
+<span id="cb17-108"><a href="#cb17-108" aria-hidden="true" tabindex="-1"></a><span class="st">        mean:</span></span>
+<span id="cb17-109"><a href="#cb17-109" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.485</span></span>
+<span id="cb17-110"><a href="#cb17-110" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.456</span></span>
+<span id="cb17-111"><a href="#cb17-111" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.406</span></span>
+<span id="cb17-112"><a href="#cb17-112" aria-hidden="true" tabindex="-1"></a><span class="st">        std:</span></span>
+<span id="cb17-113"><a href="#cb17-113" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.229</span></span>
+<span id="cb17-114"><a href="#cb17-114" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.224</span></span>
+<span id="cb17-115"><a href="#cb17-115" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.225</span></span>
+<span id="cb17-116"><a href="#cb17-116" aria-hidden="true" tabindex="-1"></a><span class="st">        order: hwc</span></span>
+<span id="cb17-117"><a href="#cb17-117" aria-hidden="true" tabindex="-1"></a><span class="st">    - ToCHWImage: null</span></span>
+<span id="cb17-118"><a href="#cb17-118" aria-hidden="true" tabindex="-1"></a><span class="st">    - KeepKeys:</span></span>
+<span id="cb17-119"><a href="#cb17-119" aria-hidden="true" tabindex="-1"></a><span class="st">        keep_keys:</span></span>
+<span id="cb17-120"><a href="#cb17-120" aria-hidden="true" tabindex="-1"></a><span class="st">        - image</span></span>
+<span id="cb17-121"><a href="#cb17-121" aria-hidden="true" tabindex="-1"></a><span class="st">        - threshold_map</span></span>
+<span id="cb17-122"><a href="#cb17-122" aria-hidden="true" tabindex="-1"></a><span class="st">        - threshold_mask</span></span>
+<span id="cb17-123"><a href="#cb17-123" aria-hidden="true" tabindex="-1"></a><span class="st">        - shrink_map</span></span>
+<span id="cb17-124"><a href="#cb17-124" aria-hidden="true" tabindex="-1"></a><span class="st">        - shrink_mask</span></span>
+<span id="cb17-125"><a href="#cb17-125" aria-hidden="true" tabindex="-1"></a><span class="st">  loader:</span></span>
+<span id="cb17-126"><a href="#cb17-126" aria-hidden="true" tabindex="-1"></a><span class="st">    shuffle: true</span></span>
+<span id="cb17-127"><a href="#cb17-127" aria-hidden="true" tabindex="-1"></a><span class="st">    drop_last: false</span></span>
+<span id="cb17-128"><a href="#cb17-128" aria-hidden="true" tabindex="-1"></a><span class="st">    batch_size_per_card: 8</span></span>
+<span id="cb17-129"><a href="#cb17-129" aria-hidden="true" tabindex="-1"></a><span class="st">    num_workers: 4</span></span>
+<span id="cb17-130"><a href="#cb17-130" aria-hidden="true" tabindex="-1"></a><span class="st">Eval:</span></span>
+<span id="cb17-131"><a href="#cb17-131" aria-hidden="true" tabindex="-1"></a><span class="st">  dataset:</span></span>
+<span id="cb17-132"><a href="#cb17-132" aria-hidden="true" tabindex="-1"></a><span class="st">    name: SimpleDataSet</span></span>
+<span id="cb17-133"><a href="#cb17-133" aria-hidden="true" tabindex="-1"></a><span class="st">    data_dir: /kaggle/input/scutctw1500-datasets/</span></span>
+<span id="cb17-134"><a href="#cb17-134" aria-hidden="true" tabindex="-1"></a><span class="st">    label_file_list:</span></span>
+<span id="cb17-135"><a href="#cb17-135" aria-hidden="true" tabindex="-1"></a><span class="st">      - /kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/test.txt</span></span>
+<span id="cb17-136"><a href="#cb17-136" aria-hidden="true" tabindex="-1"></a><span class="st">    transforms:</span></span>
+<span id="cb17-137"><a href="#cb17-137" aria-hidden="true" tabindex="-1"></a><span class="st">    - DecodeImage:</span></span>
+<span id="cb17-138"><a href="#cb17-138" aria-hidden="true" tabindex="-1"></a><span class="st">        img_mode: BGR</span></span>
+<span id="cb17-139"><a href="#cb17-139" aria-hidden="true" tabindex="-1"></a><span class="st">        channel_first: false</span></span>
+<span id="cb17-140"><a href="#cb17-140" aria-hidden="true" tabindex="-1"></a><span class="st">    - DetLabelEncode: null</span></span>
+<span id="cb17-141"><a href="#cb17-141" aria-hidden="true" tabindex="-1"></a><span class="st">    - DetResizeForTest: null</span></span>
+<span id="cb17-142"><a href="#cb17-142" aria-hidden="true" tabindex="-1"></a><span class="st">    - NormalizeImage:</span></span>
+<span id="cb17-143"><a href="#cb17-143" aria-hidden="true" tabindex="-1"></a><span class="st">        scale: 1./255.</span></span>
+<span id="cb17-144"><a href="#cb17-144" aria-hidden="true" tabindex="-1"></a><span class="st">        mean:</span></span>
+<span id="cb17-145"><a href="#cb17-145" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.485</span></span>
+<span id="cb17-146"><a href="#cb17-146" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.456</span></span>
+<span id="cb17-147"><a href="#cb17-147" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.406</span></span>
+<span id="cb17-148"><a href="#cb17-148" aria-hidden="true" tabindex="-1"></a><span class="st">        std:</span></span>
+<span id="cb17-149"><a href="#cb17-149" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.229</span></span>
+<span id="cb17-150"><a href="#cb17-150" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.224</span></span>
+<span id="cb17-151"><a href="#cb17-151" aria-hidden="true" tabindex="-1"></a><span class="st">        - 0.225</span></span>
+<span id="cb17-152"><a href="#cb17-152" aria-hidden="true" tabindex="-1"></a><span class="st">        order: hwc</span></span>
+<span id="cb17-153"><a href="#cb17-153" aria-hidden="true" tabindex="-1"></a><span class="st">    - ToCHWImage: null</span></span>
+<span id="cb17-154"><a href="#cb17-154" aria-hidden="true" tabindex="-1"></a><span class="st">    - KeepKeys:</span></span>
+<span id="cb17-155"><a href="#cb17-155" aria-hidden="true" tabindex="-1"></a><span class="st">        keep_keys:</span></span>
+<span id="cb17-156"><a href="#cb17-156" aria-hidden="true" tabindex="-1"></a><span class="st">        - image</span></span>
+<span id="cb17-157"><a href="#cb17-157" aria-hidden="true" tabindex="-1"></a><span class="st">        - shape</span></span>
+<span id="cb17-158"><a href="#cb17-158" aria-hidden="true" tabindex="-1"></a><span class="st">        - polys</span></span>
+<span id="cb17-159"><a href="#cb17-159" aria-hidden="true" tabindex="-1"></a><span class="st">        - ignore_tags</span></span>
+<span id="cb17-160"><a href="#cb17-160" aria-hidden="true" tabindex="-1"></a><span class="st">  loader:</span></span>
+<span id="cb17-161"><a href="#cb17-161" aria-hidden="true" tabindex="-1"></a><span class="st">    shuffle: false</span></span>
+<span id="cb17-162"><a href="#cb17-162" aria-hidden="true" tabindex="-1"></a><span class="st">    drop_last: false</span></span>
+<span id="cb17-163"><a href="#cb17-163" aria-hidden="true" tabindex="-1"></a><span class="st">    batch_size_per_card: 1</span></span>
+<span id="cb17-164"><a href="#cb17-164" aria-hidden="true" tabindex="-1"></a><span class="st">    num_workers: 2</span></span>
+<span id="cb17-165"><a href="#cb17-165" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb17-166"><a href="#cb17-166" aria-hidden="true" tabindex="-1"></a>PATH_TXT <span class="op">=</span> <span class="st">"/kaggle/working/config.yml"</span></span>
+<span id="cb17-167"><a href="#cb17-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-168"><a href="#cb17-168" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(PATH_TXT, <span class="st">'w'</span>, encoding <span class="op">=</span> <span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb17-169"><a href="#cb17-169" aria-hidden="true" tabindex="-1"></a>    f.write(TXT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="c68bdcd5" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:33.746256Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:33.745966Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:33.751732Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:33.750576Z&quot;}" data-papermill="{&quot;duration&quot;:0.025428,&quot;end_time&quot;:&quot;2024-11-03T04:32:33.753583&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:33.728155&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>cd <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>/kaggle/working</code></pre>
+</div>
+</div>
+<div id="0c596b5f" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:33.789575Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:33.788826Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:34.790652Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:34.789699Z&quot;}" data-papermill="{&quot;duration&quot;:1.022036,&quot;end_time&quot;:&quot;2024-11-03T04:32:34.792938&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:33.770902&quot;,&quot;status&quot;:&quot;completed&quot;}" data-scrolled="true" data-tags="[]" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>cat <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span>config.yml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Global:
+  debug: false
+  use_gpu: true
+  epoch_num: 9
+  log_smooth_window: 20
+  print_batch_step: 10
+  save_model_dir: ./output/ch_PP-OCR_V3_det/
+  save_epoch_step: 100
+  eval_batch_step:
+  - 0
+  - 400
+  cal_metric_during_train: false
+  pretrained_model: /kaggle/input/ch-pp-ocrv3-det-distill-train/student.pdparams
+  checkpoints: null
+  save_inference_dir: null
+  use_visualdl: false
+  infer_img: doc/imgs_en/img_10.jpg
+  save_res_path: ./checkpoints/det_db/predicts_db.txt
+  distributed: true
+
+Architecture:
+  model_type: det
+  algorithm: DB
+  Transform:
+  Backbone:
+    name: MobileNetV3
+    scale: 0.5
+    model_name: large
+    disable_se: True
+  Neck:
+    name: RSEFPN
+    out_channels: 96
+    shortcut: True
+  Head:
+    name: DBHead
+    k: 50
+
+Loss:
+  name: DBLoss
+  balance_loss: true
+  main_loss_type: DiceLoss
+  alpha: 5
+  beta: 10
+  ohem_ratio: 3
+Optimizer:
+  name: Adam
+  beta1: 0.9
+  beta2: 0.999
+  lr:
+    name: Cosine
+    learning_rate: 0.0001
+    warmup_epoch: 2
+  regularizer:
+    name: L2
+    factor: 5.0e-05
+PostProcess:
+  name: DBPostProcess
+  thresh: 0.3
+  box_thresh: 0.6
+  max_candidates: 1000
+  unclip_ratio: 1.5
+Metric:
+  name: DetMetric
+  main_indicator: hmean
+Train:
+  dataset:
+    name: SimpleDataSet
+    data_dir: /kaggle/input/scutctw1500-datasets/
+    label_file_list:
+      - /kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/training.txt
+    ratio_list: [1.0]
+    transforms:
+    - DecodeImage:
+        img_mode: BGR
+        channel_first: false
+    - DetLabelEncode: null
+    - IaaAugment:
+        augmenter_args:
+        - type: Fliplr
+          args:
+            p: 0.5
+        - type: Affine
+          args:
+            rotate:
+            - -10
+            - 10
+        - type: Resize
+          args:
+            size:
+            - 0.5
+            - 3
+    - EastRandomCropData:
+        size:
+        - 960
+        - 960
+        max_tries: 50
+        keep_ratio: true
+    - MakeBorderMap:
+        shrink_ratio: 0.4
+        thresh_min: 0.3
+        thresh_max: 0.7
+    - MakeShrinkMap:
+        shrink_ratio: 0.4
+        min_text_size: 8
+    - NormalizeImage:
+        scale: 1./255.
+        mean:
+        - 0.485
+        - 0.456
+        - 0.406
+        std:
+        - 0.229
+        - 0.224
+        - 0.225
+        order: hwc
+    - ToCHWImage: null
+    - KeepKeys:
+        keep_keys:
+        - image
+        - threshold_map
+        - threshold_mask
+        - shrink_map
+        - shrink_mask
+  loader:
+    shuffle: true
+    drop_last: false
+    batch_size_per_card: 8
+    num_workers: 4
+Eval:
+  dataset:
+    name: SimpleDataSet
+    data_dir: /kaggle/input/scutctw1500-datasets/
+    label_file_list:
+      - /kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/test.txt
+    transforms:
+    - DecodeImage:
+        img_mode: BGR
+        channel_first: false
+    - DetLabelEncode: null
+    - DetResizeForTest: null
+    - NormalizeImage:
+        scale: 1./255.
+        mean:
+        - 0.485
+        - 0.456
+        - 0.406
+        std:
+        - 0.229
+        - 0.224
+        - 0.225
+        order: hwc
+    - ToCHWImage: null
+    - KeepKeys:
+        keep_keys:
+        - image
+        - shape
+        - polys
+        - ignore_tags
+  loader:
+    shuffle: false
+    drop_last: false
+    batch_size_per_card: 1
+    num_workers: 2</code></pre>
+</div>
+</div>
+<p>Some of the information that <code>config.yml</code> contains is:</p>
+<ul>
+<li>Hyperparameters. The most importants are: <code>pretrained_model</code>, <code>batch_size</code>, and <code>learning_rate</code>.
+<ul>
+<li>For a single gpu:
+<ul>
+<li>batch_size = 8</li>
+<li>learning_rate = 1e-4</li>
+</ul></li>
+<li>For a single gpu with memory limitations:
+<ul>
+<li>batch_size = 4</li>
+<li>learning_rate = 5e-5</li>
+</ul></li>
+</ul></li>
+<li>The paths of our images and annotations.</li>
+<li>The algorithm and backbone.</li>
+</ul>
+<div id="ee51dedb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:34.866205Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:34.865614Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:46.361919Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:46.360703Z&quot;}" data-papermill="{&quot;duration&quot;:11.517653,&quot;end_time&quot;:&quot;2024-11-03T04:32:46.364409&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:34.846756&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install pyyaml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Requirement already satisfied: pyyaml in /opt/conda/lib/python3.10/site-packages (6.0.2)</code></pre>
+</div>
+</div>
+<div id="e01ec62b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:46.401681Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:46.400959Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:46.449263Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:46.448554Z&quot;}" data-papermill="{&quot;duration&quot;:0.068797,&quot;end_time&quot;:&quot;2024-11-03T04:32:46.451216&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:46.382419&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yaml</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the YAML file</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'/kaggle/working/config.yml'</span>, <span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> yaml.safe_load(<span class="bu">file</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="6d1b7a41" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:32:46.487516Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:32:46.487181Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:32:46.493123Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:32:46.492259Z&quot;}" data-papermill="{&quot;duration&quot;:0.026459,&quot;end_time&quot;:&quot;2024-11-03T04:32:46.495259&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:32:46.468800&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'pretrained model: </span><span class="sc">{</span>data[<span class="st">"Global"</span>][<span class="st">"pretrained_model"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'number of epochs: </span><span class="sc">{</span>data[<span class="st">"Global"</span>][<span class="st">"epoch_num"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'evaluate every: </span><span class="sc">{</span>data[<span class="st">"Global"</span>][<span class="st">"eval_batch_step"</span>][<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> iterations'</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'learning rate: </span><span class="sc">{</span>data[<span class="st">"Optimizer"</span>][<span class="st">"lr"</span>][<span class="st">"learning_rate"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'training batch size: </span><span class="sc">{</span>data[<span class="st">"Train"</span>][<span class="st">"loader"</span>][<span class="st">"batch_size_per_card"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'training images path: </span><span class="sc">{</span>data[<span class="st">"Train"</span>][<span class="st">"dataset"</span>][<span class="st">"data_dir"</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'training annotations file path: </span><span class="sc">{</span>data[<span class="st">"Train"</span>][<span class="st">"dataset"</span>][<span class="st">"label_file_list"</span>]<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>pretrained model: /kaggle/input/ch-pp-ocrv3-det-distill-train/student.pdparams
+number of epochs: 9
+evaluate every: 400 iterations
+learning rate: 0.0001
+training batch size: 8
+training images path: /kaggle/input/scutctw1500-datasets/
+training annotations file path: ['/kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/training.txt']</code></pre>
+</div>
+</div>
+</section>
+<section id="training-and-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="training-and-evaluation">Training and evaluation</h2>
+<p>We’ll make use of the Kaggle’s <code>GPU T4 x 2</code>, so we’ll perform a multi-gpu training with the following command. For more details, refer to the <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/detection_en.md">documentation</a>.</p>
+<p>The model’s evaluation will be carried out every <code>400</code> iterations as was specified in <code>config["Global"]["eval_batch_step"]</code>.</p>
+<section id="metrics" class="level3">
+<h3 class="anchored" data-anchor-id="metrics">Metrics</h3>
+<p>For the evaluation, the detection model returns hmean as the main metric, and also computes precision and recall, as you can confirm <a href="https://github.com/PaddlePaddle/PaddleOCR/blob/58e876d38d92b722f527946954c12231cd7ef7c6/ppocr/metrics/det_metric.py">here</a>.</p>
+<p>::: {#9189533e .cell _kg_hide-input=‘false’ _kg_hide-output=‘true’ execution=‘{“iopub.execute_input”:“2024-11-03T04:32:46.567358Z”,“iopub.status.busy”:“2024-11-03T04:32:46.567063Z”,“iopub.status.idle”:“2024-11-03T04:59:08.031511Z”,“shell.execute_reply”:“2024-11-03T04:59:08.030150Z”}’ papermill=‘{“duration”:1581.485899,“end_time”:“2024-11-03T04:59:08.034245”,“exception”:false,“start_time”:“2024-11-03T04:32:46.548346”,“status”:“completed”}’ scrolled=‘true’ tags=‘[]’ execution_count=12}</p>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python3 <span class="op">-</span>m paddle.distributed.launch <span class="op">--</span>gpus <span class="st">'0,1'</span> <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span>PaddleOCR<span class="op">/</span>tools<span class="op">/</span>train.py <span class="op">-</span>c <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span>config.yml</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>LAUNCH INFO 2024-11-03 04:32:48,961 -----------  Configuration  ----------------------
+LAUNCH INFO 2024-11-03 04:32:48,961 auto_parallel_config: None
+LAUNCH INFO 2024-11-03 04:32:48,961 devices: 0,1
+LAUNCH INFO 2024-11-03 04:32:48,962 elastic_level: -1
+LAUNCH INFO 2024-11-03 04:32:48,962 elastic_timeout: 30
+LAUNCH INFO 2024-11-03 04:32:48,962 gloo_port: 6767
+LAUNCH INFO 2024-11-03 04:32:48,962 host: None
+LAUNCH INFO 2024-11-03 04:32:48,962 ips: None
+LAUNCH INFO 2024-11-03 04:32:48,962 job_id: default
+LAUNCH INFO 2024-11-03 04:32:48,962 legacy: False
+LAUNCH INFO 2024-11-03 04:32:48,962 log_dir: log
+LAUNCH INFO 2024-11-03 04:32:48,962 log_level: INFO
+LAUNCH INFO 2024-11-03 04:32:48,962 log_overwrite: False
+LAUNCH INFO 2024-11-03 04:32:48,962 master: None
+LAUNCH INFO 2024-11-03 04:32:48,962 max_restart: 3
+LAUNCH INFO 2024-11-03 04:32:48,962 nnodes: 1
+LAUNCH INFO 2024-11-03 04:32:48,962 nproc_per_node: None
+LAUNCH INFO 2024-11-03 04:32:48,962 rank: -1
+LAUNCH INFO 2024-11-03 04:32:48,962 run_mode: collective
+LAUNCH INFO 2024-11-03 04:32:48,962 server_num: None
+LAUNCH INFO 2024-11-03 04:32:48,962 servers: 
+LAUNCH INFO 2024-11-03 04:32:48,962 start_port: 6070
+LAUNCH INFO 2024-11-03 04:32:48,963 trainer_num: None
+LAUNCH INFO 2024-11-03 04:32:48,963 trainers: 
+LAUNCH INFO 2024-11-03 04:32:48,963 training_script: /kaggle/working/PaddleOCR/tools/train.py
+LAUNCH INFO 2024-11-03 04:32:48,963 training_script_args: ['-c', '/kaggle/working/config.yml']
+LAUNCH INFO 2024-11-03 04:32:48,963 with_gloo: 1
+LAUNCH INFO 2024-11-03 04:32:48,963 --------------------------------------------------
+LAUNCH INFO 2024-11-03 04:32:48,963 Job: default, mode collective, replicas 1[1:1], elastic False
+LAUNCH INFO 2024-11-03 04:32:48,965 Run Pod: hsesca, replicas 2, status ready
+LAUNCH INFO 2024-11-03 04:32:48,984 Watching Pod: hsesca, replicas 2, status running
+[2024/11/03 04:32:54] ppocr INFO: Architecture : 
+[2024/11/03 04:32:54] ppocr INFO:     Backbone : 
+[2024/11/03 04:32:54] ppocr INFO:         disable_se : True
+[2024/11/03 04:32:54] ppocr INFO:         model_name : large
+[2024/11/03 04:32:54] ppocr INFO:         name : MobileNetV3
+[2024/11/03 04:32:54] ppocr INFO:         scale : 0.5
+[2024/11/03 04:32:54] ppocr INFO:     Head : 
+[2024/11/03 04:32:54] ppocr INFO:         k : 50
+[2024/11/03 04:32:54] ppocr INFO:         name : DBHead
+[2024/11/03 04:32:54] ppocr INFO:     Neck : 
+[2024/11/03 04:32:54] ppocr INFO:         name : RSEFPN
+[2024/11/03 04:32:54] ppocr INFO:         out_channels : 96
+[2024/11/03 04:32:54] ppocr INFO:         shortcut : True
+[2024/11/03 04:32:54] ppocr INFO:     Transform : None
+[2024/11/03 04:32:54] ppocr INFO:     algorithm : DB
+[2024/11/03 04:32:54] ppocr INFO:     model_type : det
+[2024/11/03 04:32:54] ppocr INFO: Eval : 
+[2024/11/03 04:32:54] ppocr INFO:     dataset : 
+[2024/11/03 04:32:54] ppocr INFO:         data_dir : /kaggle/input/scutctw1500-datasets/
+[2024/11/03 04:32:54] ppocr INFO:         label_file_list : ['/kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/test.txt']
+[2024/11/03 04:32:54] ppocr INFO:         name : SimpleDataSet
+[2024/11/03 04:32:54] ppocr INFO:         transforms : 
+[2024/11/03 04:32:54] ppocr INFO:             DecodeImage : 
+[2024/11/03 04:32:54] ppocr INFO:                 channel_first : False
+[2024/11/03 04:32:54] ppocr INFO:                 img_mode : BGR
+[2024/11/03 04:32:54] ppocr INFO:             DetLabelEncode : None
+[2024/11/03 04:32:54] ppocr INFO:             DetResizeForTest : None
+[2024/11/03 04:32:54] ppocr INFO:             NormalizeImage : 
+[2024/11/03 04:32:54] ppocr INFO:                 mean : [0.485, 0.456, 0.406]
+[2024/11/03 04:32:54] ppocr INFO:                 order : hwc
+[2024/11/03 04:32:54] ppocr INFO:                 scale : 1./255.
+[2024/11/03 04:32:54] ppocr INFO:                 std : [0.229, 0.224, 0.225]
+[2024/11/03 04:32:54] ppocr INFO:             ToCHWImage : None
+[2024/11/03 04:32:54] ppocr INFO:             KeepKeys : 
+[2024/11/03 04:32:54] ppocr INFO:                 keep_keys : ['image', 'shape', 'polys', 'ignore_tags']
+[2024/11/03 04:32:54] ppocr INFO:     loader : 
+[2024/11/03 04:32:54] ppocr INFO:         batch_size_per_card : 1
+[2024/11/03 04:32:54] ppocr INFO:         drop_last : False
+[2024/11/03 04:32:54] ppocr INFO:         num_workers : 2
+[2024/11/03 04:32:54] ppocr INFO:         shuffle : False
+[2024/11/03 04:32:54] ppocr INFO: Global : 
+[2024/11/03 04:32:54] ppocr INFO:     cal_metric_during_train : False
+[2024/11/03 04:32:54] ppocr INFO:     checkpoints : None
+[2024/11/03 04:32:54] ppocr INFO:     debug : False
+[2024/11/03 04:32:54] ppocr INFO:     distributed : True
+[2024/11/03 04:32:54] ppocr INFO:     epoch_num : 9
+[2024/11/03 04:32:54] ppocr INFO:     eval_batch_step : [0, 400]
+[2024/11/03 04:32:54] ppocr INFO:     infer_img : doc/imgs_en/img_10.jpg
+[2024/11/03 04:32:54] ppocr INFO:     log_smooth_window : 20
+[2024/11/03 04:32:54] ppocr INFO:     pretrained_model : /kaggle/input/ch-pp-ocrv3-det-distill-train/student.pdparams
+[2024/11/03 04:32:54] ppocr INFO:     print_batch_step : 10
+[2024/11/03 04:32:54] ppocr INFO:     save_epoch_step : 100
+[2024/11/03 04:32:54] ppocr INFO:     save_inference_dir : None
+[2024/11/03 04:32:54] ppocr INFO:     save_model_dir : ./output/ch_PP-OCR_V3_det/
+[2024/11/03 04:32:54] ppocr INFO:     save_res_path : ./checkpoints/det_db/predicts_db.txt
+[2024/11/03 04:32:54] ppocr INFO:     use_gpu : True
+[2024/11/03 04:32:54] ppocr INFO:     use_visualdl : False
+[2024/11/03 04:32:54] ppocr INFO: Loss : 
+[2024/11/03 04:32:54] ppocr INFO:     alpha : 5
+[2024/11/03 04:32:54] ppocr INFO:     balance_loss : True
+[2024/11/03 04:32:54] ppocr INFO:     beta : 10
+[2024/11/03 04:32:54] ppocr INFO:     main_loss_type : DiceLoss
+[2024/11/03 04:32:54] ppocr INFO:     name : DBLoss
+[2024/11/03 04:32:54] ppocr INFO:     ohem_ratio : 3
+[2024/11/03 04:32:54] ppocr INFO: Metric : 
+[2024/11/03 04:32:54] ppocr INFO:     main_indicator : hmean
+[2024/11/03 04:32:54] ppocr INFO:     name : DetMetric
+[2024/11/03 04:32:54] ppocr INFO: Optimizer : 
+[2024/11/03 04:32:54] ppocr INFO:     beta1 : 0.9
+[2024/11/03 04:32:54] ppocr INFO:     beta2 : 0.999
+[2024/11/03 04:32:54] ppocr INFO:     lr : 
+[2024/11/03 04:32:54] ppocr INFO:         learning_rate : 0.0001
+[2024/11/03 04:32:54] ppocr INFO:         name : Cosine
+[2024/11/03 04:32:54] ppocr INFO:         warmup_epoch : 2
+[2024/11/03 04:32:54] ppocr INFO:     name : Adam
+[2024/11/03 04:32:54] ppocr INFO:     regularizer : 
+[2024/11/03 04:32:54] ppocr INFO:         factor : 5e-05
+[2024/11/03 04:32:54] ppocr INFO:         name : L2
+[2024/11/03 04:32:54] ppocr INFO: PostProcess : 
+[2024/11/03 04:32:54] ppocr INFO:     box_thresh : 0.6
+[2024/11/03 04:32:54] ppocr INFO:     max_candidates : 1000
+[2024/11/03 04:32:54] ppocr INFO:     name : DBPostProcess
+[2024/11/03 04:32:54] ppocr INFO:     thresh : 0.3
+[2024/11/03 04:32:54] ppocr INFO:     unclip_ratio : 1.5
+[2024/11/03 04:32:54] ppocr INFO: Train : 
+[2024/11/03 04:32:54] ppocr INFO:     dataset : 
+[2024/11/03 04:32:54] ppocr INFO:         data_dir : /kaggle/input/scutctw1500-datasets/
+[2024/11/03 04:32:54] ppocr INFO:         label_file_list : ['/kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/training.txt']
+[2024/11/03 04:32:54] ppocr INFO:         name : SimpleDataSet
+[2024/11/03 04:32:54] ppocr INFO:         ratio_list : [1.0]
+[2024/11/03 04:32:54] ppocr INFO:         transforms : 
+[2024/11/03 04:32:54] ppocr INFO:             DecodeImage : 
+[2024/11/03 04:32:54] ppocr INFO:                 channel_first : False
+[2024/11/03 04:32:54] ppocr INFO:                 img_mode : BGR
+[2024/11/03 04:32:54] ppocr INFO:             DetLabelEncode : None
+[2024/11/03 04:32:54] ppocr INFO:             IaaAugment : 
+[2024/11/03 04:32:54] ppocr INFO:                 augmenter_args : 
+[2024/11/03 04:32:54] ppocr INFO:                     args : 
+[2024/11/03 04:32:54] ppocr INFO:                         p : 0.5
+[2024/11/03 04:32:54] ppocr INFO:                     type : Fliplr
+[2024/11/03 04:32:54] ppocr INFO:                     args : 
+[2024/11/03 04:32:54] ppocr INFO:                         rotate : [-10, 10]
+[2024/11/03 04:32:54] ppocr INFO:                     type : Affine
+[2024/11/03 04:32:54] ppocr INFO:                     args : 
+[2024/11/03 04:32:54] ppocr INFO:                         size : [0.5, 3]
+[2024/11/03 04:32:54] ppocr INFO:                     type : Resize
+[2024/11/03 04:32:54] ppocr INFO:             EastRandomCropData : 
+[2024/11/03 04:32:54] ppocr INFO:                 keep_ratio : True
+[2024/11/03 04:32:54] ppocr INFO:                 max_tries : 50
+[2024/11/03 04:32:54] ppocr INFO:                 size : [960, 960]
+[2024/11/03 04:32:54] ppocr INFO:             MakeBorderMap : 
+[2024/11/03 04:32:54] ppocr INFO:                 shrink_ratio : 0.4
+[2024/11/03 04:32:54] ppocr INFO:                 thresh_max : 0.7
+[2024/11/03 04:32:54] ppocr INFO:                 thresh_min : 0.3
+[2024/11/03 04:32:54] ppocr INFO:             MakeShrinkMap : 
+[2024/11/03 04:32:54] ppocr INFO:                 min_text_size : 8
+[2024/11/03 04:32:54] ppocr INFO:                 shrink_ratio : 0.4
+[2024/11/03 04:32:54] ppocr INFO:             NormalizeImage : 
+[2024/11/03 04:32:54] ppocr INFO:                 mean : [0.485, 0.456, 0.406]
+[2024/11/03 04:32:54] ppocr INFO:                 order : hwc
+[2024/11/03 04:32:54] ppocr INFO:                 scale : 1./255.
+[2024/11/03 04:32:54] ppocr INFO:                 std : [0.229, 0.224, 0.225]
+[2024/11/03 04:32:54] ppocr INFO:             ToCHWImage : None
+[2024/11/03 04:32:54] ppocr INFO:             KeepKeys : 
+[2024/11/03 04:32:54] ppocr INFO:                 keep_keys : ['image', 'threshold_map', 'threshold_mask', 'shrink_map', 'shrink_mask']
+[2024/11/03 04:32:54] ppocr INFO:     loader : 
+[2024/11/03 04:32:54] ppocr INFO:         batch_size_per_card : 8
+[2024/11/03 04:32:54] ppocr INFO:         drop_last : False
+[2024/11/03 04:32:54] ppocr INFO:         num_workers : 4
+[2024/11/03 04:32:54] ppocr INFO:         shuffle : True
+[2024/11/03 04:32:54] ppocr INFO: profiler_options : None
+[2024/11/03 04:32:54] ppocr INFO: train with paddle 2.5.0 and device Place(gpu:0)
+======================= Modified FLAGS detected =======================
+FLAGS(name='FLAGS_selected_gpus', current_value='0', default_value='')
+=======================================================================
+I1103 04:32:54.189285   142 tcp_utils.cc:181] The server starts to listen on IP_ANY:35737
+I1103 04:32:54.189476   142 tcp_utils.cc:130] Successfully connected to 172.19.2.2:35737
+W1103 04:32:57.412665   142 gpu_resources.cc:119] Please NOTE: device: 0, GPU Compute Capability: 7.5, Driver API Version: 12.4, Runtime API Version: 11.8
+W1103 04:32:57.413568   142 gpu_resources.cc:149] device: 0, cuDNN Version: 90.0.
+[2024/11/03 04:32:57] ppocr INFO: Initialize indexs of datasets:['/kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/training.txt']
+[2024/11/03 04:32:57] ppocr INFO: Initialize indexs of datasets:['/kaggle/input/scut-ctw1500-annotations-supported-by-paddleocr-2/test.txt']
+[2024/11/03 04:32:58] ppocr INFO: train dataloader has 63 iters
+[2024/11/03 04:32:58] ppocr INFO: valid dataloader has 500 iters
+[2024/11/03 04:32:58] ppocr INFO: load pretrain successful from /kaggle/input/ch-pp-ocrv3-det-distill-train/student
+[2024/11/03 04:32:58] ppocr INFO: During the training process, after the 0th iteration, an evaluation is run every 400 iterations
+[2024/11/03 04:33:37] ppocr INFO: epoch: [1/9], global_step: 10, lr: 0.000004, loss: 2.625730, loss_shrink_maps: 1.582476, loss_threshold_maps: 0.737675, loss_binary_maps: 0.316313, loss_cbn: 0.000000, avg_reader_cost: 3.01776 s, avg_batch_cost: 3.86246 s, avg_samples: 8.0, ips: 2.07122 samples/s, eta: 0:35:51, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:33:57] ppocr INFO: epoch: [1/9], global_step: 20, lr: 0.000008, loss: 2.592360, loss_shrink_maps: 1.592752, loss_threshold_maps: 0.688670, loss_binary_maps: 0.318778, loss_cbn: 0.000000, avg_reader_cost: 1.25730 s, avg_batch_cost: 1.77629 s, avg_samples: 8.0, ips: 4.50377 samples/s, eta: 0:25:42, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:34:32] ppocr INFO: epoch: [1/9], global_step: 30, lr: 0.000015, loss: 2.311398, loss_shrink_maps: 1.393297, loss_threshold_maps: 0.656707, loss_binary_maps: 0.278827, loss_cbn: 0.000000, avg_reader_cost: 2.72139 s, avg_batch_cost: 3.33408 s, avg_samples: 8.0, ips: 2.39946 samples/s, eta: 0:26:46, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:34:52] ppocr INFO: epoch: [1/9], global_step: 40, lr: 0.000023, loss: 2.240226, loss_shrink_maps: 1.345361, loss_threshold_maps: 0.664764, loss_binary_maps: 0.268746, loss_cbn: 0.000000, avg_reader_cost: 1.23896 s, avg_batch_cost: 1.81276 s, avg_samples: 8.0, ips: 4.41317 samples/s, eta: 0:23:41, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:35:22] ppocr INFO: epoch: [1/9], global_step: 50, lr: 0.000031, loss: 2.233117, loss_shrink_maps: 1.382743, loss_threshold_maps: 0.626239, loss_binary_maps: 0.276521, loss_cbn: 0.000000, avg_reader_cost: 2.10767 s, avg_batch_cost: 2.69990 s, avg_samples: 8.0, ips: 2.96307 samples/s, eta: 0:23:14, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:35:41] ppocr INFO: epoch: [1/9], global_step: 60, lr: 0.000039, loss: 2.317220, loss_shrink_maps: 1.402420, loss_threshold_maps: 0.621249, loss_binary_maps: 0.280584, loss_cbn: 0.000000, avg_reader_cost: 1.07282 s, avg_batch_cost: 1.57645 s, avg_samples: 8.0, ips: 5.07469 samples/s, eta: 0:21:12, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:35:47] ppocr INFO: epoch: [1/9], global_step: 63, lr: 0.000042, loss: 2.317220, loss_shrink_maps: 1.402420, loss_threshold_maps: 0.635238, loss_binary_maps: 0.280584, loss_cbn: 0.000000, avg_reader_cost: 0.39595 s, avg_batch_cost: 0.47731 s, avg_samples: 2.0, ips: 4.19012 samples/s, eta: 0:20:43, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:35:47] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:36:15] ppocr INFO: epoch: [2/9], global_step: 70, lr: 0.000047, loss: 2.395437, loss_shrink_maps: 1.430268, loss_threshold_maps: 0.665345, loss_binary_maps: 0.285744, loss_cbn: 0.000000, avg_reader_cost: 2.02815 s, avg_batch_cost: 2.41918 s, avg_samples: 5.6, ips: 2.31484 samples/s, eta: 0:21:15, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:36:41] ppocr INFO: epoch: [2/9], global_step: 80, lr: 0.000055, loss: 2.363410, loss_shrink_maps: 1.422780, loss_threshold_maps: 0.672981, loss_binary_maps: 0.284517, loss_cbn: 0.000000, avg_reader_cost: 1.92228 s, avg_batch_cost: 2.56532 s, avg_samples: 8.0, ips: 3.11852 samples/s, eta: 0:20:49, max_mem_reserved: 6488 MB, max_mem_allocated: 5426 MB
+[2024/11/03 04:37:10] ppocr INFO: epoch: [2/9], global_step: 90, lr: 0.000063, loss: 2.333830, loss_shrink_maps: 1.406721, loss_threshold_maps: 0.669343, loss_binary_maps: 0.281163, loss_cbn: 0.000000, avg_reader_cost: 1.75030 s, avg_batch_cost: 2.35424 s, avg_samples: 8.0, ips: 3.39813 samples/s, eta: 0:20:12, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:37:37] ppocr INFO: epoch: [2/9], global_step: 100, lr: 0.000071, loss: 2.499909, loss_shrink_maps: 1.495040, loss_threshold_maps: 0.695264, loss_binary_maps: 0.298621, loss_cbn: 0.000000, avg_reader_cost: 1.64612 s, avg_batch_cost: 2.22083 s, avg_samples: 8.0, ips: 3.60226 samples/s, eta: 0:19:32, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:38:05] ppocr INFO: epoch: [2/9], global_step: 110, lr: 0.000079, loss: 2.350222, loss_shrink_maps: 1.369941, loss_threshold_maps: 0.692006, loss_binary_maps: 0.273916, loss_cbn: 0.000000, avg_reader_cost: 1.87359 s, avg_batch_cost: 2.51999 s, avg_samples: 8.0, ips: 3.17461 samples/s, eta: 0:19:07, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:38:30] ppocr INFO: epoch: [2/9], global_step: 120, lr: 0.000087, loss: 2.147838, loss_shrink_maps: 1.272873, loss_threshold_maps: 0.646919, loss_binary_maps: 0.254500, loss_cbn: 0.000000, avg_reader_cost: 1.73654 s, avg_batch_cost: 2.33431 s, avg_samples: 8.0, ips: 3.42714 samples/s, eta: 0:18:35, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:38:36] ppocr INFO: epoch: [2/9], global_step: 126, lr: 0.000092, loss: 2.132823, loss_shrink_maps: 1.272951, loss_threshold_maps: 0.623696, loss_binary_maps: 0.254266, loss_cbn: 0.000000, avg_reader_cost: 0.29698 s, avg_batch_cost: 0.50833 s, avg_samples: 4.4, ips: 8.65579 samples/s, eta: 0:17:46, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:38:37] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:38:56] ppocr INFO: epoch: [3/9], global_step: 130, lr: 0.000095, loss: 2.262186, loss_shrink_maps: 1.344731, loss_threshold_maps: 0.631894, loss_binary_maps: 0.268364, loss_cbn: 0.000000, avg_reader_cost: 1.64887 s, avg_batch_cost: 1.87177 s, avg_samples: 3.2, ips: 1.70962 samples/s, eta: 0:18:06, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:39:28] ppocr INFO: epoch: [3/9], global_step: 140, lr: 0.000100, loss: 2.236050, loss_shrink_maps: 1.358324, loss_threshold_maps: 0.616536, loss_binary_maps: 0.269790, loss_cbn: 0.000000, avg_reader_cost: 1.93969 s, avg_batch_cost: 2.50238 s, avg_samples: 8.0, ips: 3.19695 samples/s, eta: 0:17:42, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:39:50] ppocr INFO: epoch: [3/9], global_step: 150, lr: 0.000100, loss: 2.135771, loss_shrink_maps: 1.262699, loss_threshold_maps: 0.616536, loss_binary_maps: 0.253087, loss_cbn: 0.000000, avg_reader_cost: 1.23326 s, avg_batch_cost: 1.78648 s, avg_samples: 8.0, ips: 4.47808 samples/s, eta: 0:16:58, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:40:18] ppocr INFO: epoch: [3/9], global_step: 160, lr: 0.000100, loss: 2.129953, loss_shrink_maps: 1.259897, loss_threshold_maps: 0.624529, loss_binary_maps: 0.252346, loss_cbn: 0.000000, avg_reader_cost: 1.56159 s, avg_batch_cost: 2.11042 s, avg_samples: 8.0, ips: 3.79072 samples/s, eta: 0:16:25, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:40:47] ppocr INFO: epoch: [3/9], global_step: 170, lr: 0.000099, loss: 2.151436, loss_shrink_maps: 1.299210, loss_threshold_maps: 0.636451, loss_binary_maps: 0.259624, loss_cbn: 0.000000, avg_reader_cost: 1.93246 s, avg_batch_cost: 2.51588 s, avg_samples: 8.0, ips: 3.17980 samples/s, eta: 0:16:03, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:41:14] ppocr INFO: epoch: [3/9], global_step: 180, lr: 0.000099, loss: 2.251417, loss_shrink_maps: 1.313658, loss_threshold_maps: 0.629553, loss_binary_maps: 0.262893, loss_cbn: 0.000000, avg_reader_cost: 1.86232 s, avg_batch_cost: 2.41027 s, avg_samples: 8.0, ips: 3.31913 samples/s, eta: 0:15:38, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:41:25] ppocr INFO: epoch: [3/9], global_step: 189, lr: 0.000098, loss: 2.351348, loss_shrink_maps: 1.410176, loss_threshold_maps: 0.643906, loss_binary_maps: 0.282094, loss_cbn: 0.000000, avg_reader_cost: 0.52533 s, avg_batch_cost: 0.87673 s, avg_samples: 6.8, ips: 7.75607 samples/s, eta: 0:14:50, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:41:25] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:41:36] ppocr INFO: epoch: [4/9], global_step: 190, lr: 0.000098, loss: 2.351348, loss_shrink_maps: 1.410176, loss_threshold_maps: 0.643906, loss_binary_maps: 0.282094, loss_cbn: 0.000000, avg_reader_cost: 1.04584 s, avg_batch_cost: 1.10682 s, avg_samples: 0.8, ips: 0.72279 samples/s, eta: 0:15:05, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:42:08] ppocr INFO: epoch: [4/9], global_step: 200, lr: 0.000097, loss: 2.151351, loss_shrink_maps: 1.252916, loss_threshold_maps: 0.639604, loss_binary_maps: 0.250106, loss_cbn: 0.000000, avg_reader_cost: 2.08022 s, avg_batch_cost: 2.70693 s, avg_samples: 8.0, ips: 2.95537 samples/s, eta: 0:14:47, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:42:40] ppocr INFO: epoch: [4/9], global_step: 210, lr: 0.000096, loss: 2.063997, loss_shrink_maps: 1.206146, loss_threshold_maps: 0.642379, loss_binary_maps: 0.241443, loss_cbn: 0.000000, avg_reader_cost: 2.43621 s, avg_batch_cost: 3.04598 s, avg_samples: 8.0, ips: 2.62642 samples/s, eta: 0:14:33, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:43:03] ppocr INFO: epoch: [4/9], global_step: 220, lr: 0.000095, loss: 2.116390, loss_shrink_maps: 1.252069, loss_threshold_maps: 0.617974, loss_binary_maps: 0.250008, loss_cbn: 0.000000, avg_reader_cost: 1.50384 s, avg_batch_cost: 2.08023 s, avg_samples: 8.0, ips: 3.84572 samples/s, eta: 0:14:03, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:43:34] ppocr INFO: epoch: [4/9], global_step: 230, lr: 0.000093, loss: 2.179658, loss_shrink_maps: 1.315474, loss_threshold_maps: 0.614312, loss_binary_maps: 0.263777, loss_cbn: 0.000000, avg_reader_cost: 2.35932 s, avg_batch_cost: 3.04992 s, avg_samples: 8.0, ips: 2.62302 samples/s, eta: 0:13:48, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:43:57] ppocr INFO: epoch: [4/9], global_step: 240, lr: 0.000092, loss: 2.210261, loss_shrink_maps: 1.308718, loss_threshold_maps: 0.652272, loss_binary_maps: 0.262488, loss_cbn: 0.000000, avg_reader_cost: 1.25722 s, avg_batch_cost: 1.76038 s, avg_samples: 8.0, ips: 4.54447 samples/s, eta: 0:13:14, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:44:21] ppocr INFO: epoch: [4/9], global_step: 250, lr: 0.000090, loss: 2.152354, loss_shrink_maps: 1.274938, loss_threshold_maps: 0.643933, loss_binary_maps: 0.254886, loss_cbn: 0.000000, avg_reader_cost: 1.67055 s, avg_batch_cost: 2.11379 s, avg_samples: 8.0, ips: 3.78467 samples/s, eta: 0:12:45, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:44:22] ppocr INFO: epoch: [4/9], global_step: 252, lr: 0.000090, loss: 2.119335, loss_shrink_maps: 1.238672, loss_threshold_maps: 0.621599, loss_binary_maps: 0.247963, loss_cbn: 0.000000, avg_reader_cost: 0.00037 s, avg_batch_cost: 0.04410 s, avg_samples: 1.2, ips: 27.21087 samples/s, eta: 0:12:35, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:44:22] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:44:50] ppocr INFO: epoch: [5/9], global_step: 260, lr: 0.000089, loss: 2.052530, loss_shrink_maps: 1.198041, loss_threshold_maps: 0.608119, loss_binary_maps: 0.239578, loss_cbn: 0.000000, avg_reader_cost: 2.27624 s, avg_batch_cost: 2.75264 s, avg_samples: 6.4, ips: 2.32504 samples/s, eta: 0:12:26, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:45:25] ppocr INFO: epoch: [5/9], global_step: 270, lr: 0.000087, loss: 2.038088, loss_shrink_maps: 1.181046, loss_threshold_maps: 0.617039, loss_binary_maps: 0.236133, loss_cbn: 0.000000, avg_reader_cost: 2.76890 s, avg_batch_cost: 3.32540 s, avg_samples: 8.0, ips: 2.40573 samples/s, eta: 0:12:11, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:45:44] ppocr INFO: epoch: [5/9], global_step: 280, lr: 0.000085, loss: 1.996851, loss_shrink_maps: 1.160551, loss_threshold_maps: 0.617039, loss_binary_maps: 0.232349, loss_cbn: 0.000000, avg_reader_cost: 1.22277 s, avg_batch_cost: 1.75641 s, avg_samples: 8.0, ips: 4.55474 samples/s, eta: 0:11:39, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:46:18] ppocr INFO: epoch: [5/9], global_step: 290, lr: 0.000083, loss: 2.169122, loss_shrink_maps: 1.305665, loss_threshold_maps: 0.597343, loss_binary_maps: 0.261800, loss_cbn: 0.000000, avg_reader_cost: 2.69256 s, avg_batch_cost: 3.21039 s, avg_samples: 8.0, ips: 2.49191 samples/s, eta: 0:11:22, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:46:43] ppocr INFO: epoch: [5/9], global_step: 300, lr: 0.000081, loss: 2.186798, loss_shrink_maps: 1.333531, loss_threshold_maps: 0.616924, loss_binary_maps: 0.267025, loss_cbn: 0.000000, avg_reader_cost: 1.85622 s, avg_batch_cost: 2.33086 s, avg_samples: 8.0, ips: 3.43222 samples/s, eta: 0:10:56, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:47:07] ppocr INFO: epoch: [5/9], global_step: 310, lr: 0.000079, loss: 2.235190, loss_shrink_maps: 1.343430, loss_threshold_maps: 0.632028, loss_binary_maps: 0.268855, loss_cbn: 0.000000, avg_reader_cost: 1.57206 s, avg_batch_cost: 2.20297 s, avg_samples: 8.0, ips: 3.63146 samples/s, eta: 0:10:30, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:47:13] ppocr INFO: epoch: [5/9], global_step: 315, lr: 0.000077, loss: 2.226589, loss_shrink_maps: 1.315827, loss_threshold_maps: 0.615102, loss_binary_maps: 0.263401, loss_cbn: 0.000000, avg_reader_cost: 0.29570 s, avg_batch_cost: 0.45185 s, avg_samples: 3.6, ips: 7.96726 samples/s, eta: 0:10:11, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:47:13] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:47:35] ppocr INFO: epoch: [6/9], global_step: 320, lr: 0.000076, loss: 2.190357, loss_shrink_maps: 1.310976, loss_threshold_maps: 0.609789, loss_binary_maps: 0.261971, loss_cbn: 0.000000, avg_reader_cost: 1.65239 s, avg_batch_cost: 1.97758 s, avg_samples: 4.0, ips: 2.02268 samples/s, eta: 0:10:05, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:48:02] ppocr INFO: epoch: [6/9], global_step: 330, lr: 0.000074, loss: 2.058090, loss_shrink_maps: 1.232558, loss_threshold_maps: 0.611479, loss_binary_maps: 0.246479, loss_cbn: 0.000000, avg_reader_cost: 1.47726 s, avg_batch_cost: 2.10563 s, avg_samples: 8.0, ips: 3.79934 samples/s, eta: 0:09:38, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:48:23] ppocr INFO: epoch: [6/9], global_step: 340, lr: 0.000071, loss: 2.081484, loss_shrink_maps: 1.232558, loss_threshold_maps: 0.624323, loss_binary_maps: 0.246479, loss_cbn: 0.000000, avg_reader_cost: 0.96634 s, avg_batch_cost: 1.49942 s, avg_samples: 8.0, ips: 5.33540 samples/s, eta: 0:09:07, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:48:54] ppocr INFO: epoch: [6/9], global_step: 350, lr: 0.000069, loss: 2.144902, loss_shrink_maps: 1.238794, loss_threshold_maps: 0.625834, loss_binary_maps: 0.247815, loss_cbn: 0.000000, avg_reader_cost: 1.24869 s, avg_batch_cost: 1.82853 s, avg_samples: 8.0, ips: 4.37510 samples/s, eta: 0:08:40, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:49:20] ppocr INFO: epoch: [6/9], global_step: 360, lr: 0.000066, loss: 2.225792, loss_shrink_maps: 1.289856, loss_threshold_maps: 0.648004, loss_binary_maps: 0.258069, loss_cbn: 0.000000, avg_reader_cost: 1.34400 s, avg_batch_cost: 1.87100 s, avg_samples: 8.0, ips: 4.27578 samples/s, eta: 0:08:13, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:49:49] ppocr INFO: epoch: [6/9], global_step: 370, lr: 0.000064, loss: 2.212562, loss_shrink_maps: 1.329945, loss_threshold_maps: 0.630948, loss_binary_maps: 0.267370, loss_cbn: 0.000000, avg_reader_cost: 0.36812 s, avg_batch_cost: 0.91501 s, avg_samples: 8.0, ips: 8.74309 samples/s, eta: 0:07:41, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:50:00] ppocr INFO: epoch: [6/9], global_step: 378, lr: 0.000062, loss: 2.167378, loss_shrink_maps: 1.304021, loss_threshold_maps: 0.600547, loss_binary_maps: 0.261007, loss_cbn: 0.000000, avg_reader_cost: 0.06977 s, avg_batch_cost: 0.35862 s, avg_samples: 6.0, ips: 16.73094 samples/s, eta: 0:07:15, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:50:00] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:50:18] ppocr INFO: epoch: [7/9], global_step: 380, lr: 0.000061, loss: 2.212562, loss_shrink_maps: 1.329945, loss_threshold_maps: 0.619732, loss_binary_maps: 0.267370, loss_cbn: 0.000000, avg_reader_cost: 1.63883 s, avg_batch_cost: 1.79571 s, avg_samples: 1.6, ips: 0.89101 samples/s, eta: 0:07:17, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:50:43] ppocr INFO: epoch: [7/9], global_step: 390, lr: 0.000058, loss: 2.163812, loss_shrink_maps: 1.273323, loss_threshold_maps: 0.644569, loss_binary_maps: 0.254687, loss_cbn: 0.000000, avg_reader_cost: 1.74186 s, avg_batch_cost: 2.30005 s, avg_samples: 8.0, ips: 3.47819 samples/s, eta: 0:06:53, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:51:13] ppocr INFO: epoch: [7/9], global_step: 400, lr: 0.000056, loss: 2.021738, loss_shrink_maps: 1.194202, loss_threshold_maps: 0.611192, loss_binary_maps: 0.238939, loss_cbn: 0.000000, avg_reader_cost: 2.15325 s, avg_batch_cost: 2.75642 s, avg_samples: 8.0, ips: 2.90232 samples/s, eta: 0:06:31, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+
+eval model::   0%|          | 0/500 [00:00&lt;?, ?it/s]
+eval model::   0%|          | 1/500 [00:00&lt;06:55,  1.20it/s]
+eval model::   0%|          | 2/500 [00:01&lt;03:55,  2.12it/s]
+eval model::   1%|          | 3/500 [00:01&lt;03:27,  2.39it/s]
+eval model::   1%|          | 4/500 [00:01&lt;02:45,  3.00it/s]
+eval model::   1%|          | 5/500 [00:01&lt;02:41,  3.07it/s]
+eval model::   1%|          | 6/500 [00:02&lt;02:17,  3.60it/s]
+eval model::   1%|▏         | 7/500 [00:02&lt;01:54,  4.31it/s]
+eval model::   2%|▏         | 8/500 [00:02&lt;01:40,  4.92it/s]
+eval model::   2%|▏         | 9/500 [00:02&lt;02:34,  3.19it/s]
+eval model::   2%|▏         | 11/500 [00:03&lt;01:41,  4.81it/s]
+eval model::   2%|▏         | 12/500 [00:03&lt;02:13,  3.66it/s]
+eval model::   3%|▎         | 13/500 [00:03&lt;02:09,  3.75it/s]
+eval model::   3%|▎         | 14/500 [00:04&lt;02:04,  3.90it/s]
+eval model::   3%|▎         | 15/500 [00:04&lt;02:18,  3.50it/s]
+eval model::   3%|▎         | 16/500 [00:05&lt;03:36,  2.23it/s]
+eval model::   3%|▎         | 17/500 [00:05&lt;02:56,  2.73it/s]
+eval model::   4%|▎         | 18/500 [00:05&lt;02:27,  3.26it/s]
+eval model::   4%|▍         | 19/500 [00:05&lt;02:03,  3.89it/s]
+eval model::   4%|▍         | 20/500 [00:05&lt;01:59,  4.02it/s]
+eval model::   4%|▍         | 21/500 [00:06&lt;01:51,  4.29it/s]
+eval model::   4%|▍         | 22/500 [00:06&lt;01:51,  4.29it/s]
+eval model::   5%|▍         | 23/500 [00:06&lt;01:41,  4.69it/s]
+eval model::   5%|▍         | 24/500 [00:06&lt;01:36,  4.94it/s]
+eval model::   5%|▌         | 25/500 [00:06&lt;01:30,  5.26it/s]
+eval model::   5%|▌         | 26/500 [00:07&lt;01:21,  5.78it/s]
+eval model::   5%|▌         | 27/500 [00:07&lt;01:22,  5.70it/s]
+eval model::   6%|▌         | 28/500 [00:07&lt;01:24,  5.57it/s]
+eval model::   6%|▌         | 29/500 [00:07&lt;01:16,  6.20it/s]
+eval model::   6%|▌         | 30/500 [00:08&lt;02:06,  3.72it/s]
+eval model::   6%|▌         | 31/500 [00:08&lt;01:48,  4.31it/s]
+eval model::   6%|▋         | 32/500 [00:08&lt;01:40,  4.65it/s]
+eval model::   7%|▋         | 34/500 [00:08&lt;01:19,  5.86it/s]
+eval model::   7%|▋         | 36/500 [00:08&lt;01:02,  7.46it/s]
+eval model::   7%|▋         | 37/500 [00:08&lt;00:59,  7.75it/s]
+eval model::   8%|▊         | 39/500 [00:09&lt;00:49,  9.25it/s]
+eval model::   8%|▊         | 40/500 [00:09&lt;01:01,  7.46it/s]
+eval model::   8%|▊         | 42/500 [00:09&lt;00:54,  8.43it/s]
+eval model::   9%|▊         | 43/500 [00:09&lt;00:53,  8.60it/s]
+eval model::   9%|▉         | 44/500 [00:10&lt;01:47,  4.24it/s]
+eval model::   9%|▉         | 45/500 [00:10&lt;01:35,  4.76it/s]
+eval model::   9%|▉         | 46/500 [00:10&lt;01:26,  5.28it/s]
+eval model::  10%|▉         | 48/500 [00:10&lt;01:03,  7.10it/s]
+eval model::  10%|█         | 51/500 [00:10&lt;00:46,  9.60it/s]
+eval model::  11%|█         | 53/500 [00:10&lt;00:41, 10.89it/s]
+eval model::  11%|█         | 55/500 [00:11&lt;00:37, 11.89it/s]
+eval model::  11%|█▏        | 57/500 [00:11&lt;00:35, 12.53it/s]
+eval model::  12%|█▏        | 59/500 [00:11&lt;00:44,  9.90it/s]
+eval model::  12%|█▏        | 61/500 [00:11&lt;00:42, 10.38it/s]
+eval model::  13%|█▎        | 63/500 [00:11&lt;00:43, 10.10it/s]
+eval model::  13%|█▎        | 65/500 [00:12&lt;00:39, 11.03it/s]
+eval model::  13%|█▎        | 67/500 [00:12&lt;00:34, 12.51it/s]
+eval model::  14%|█▍        | 69/500 [00:12&lt;00:30, 13.97it/s]
+eval model::  14%|█▍        | 71/500 [00:12&lt;00:30, 14.17it/s]
+eval model::  15%|█▍        | 73/500 [00:12&lt;00:29, 14.50it/s]
+eval model::  15%|█▌        | 75/500 [00:12&lt;00:27, 15.40it/s]
+eval model::  15%|█▌        | 77/500 [00:12&lt;00:33, 12.46it/s]
+eval model::  16%|█▌        | 80/500 [00:12&lt;00:26, 16.07it/s]
+eval model::  16%|█▋        | 82/500 [00:13&lt;00:27, 15.17it/s]
+eval model::  17%|█▋        | 84/500 [00:13&lt;00:25, 16.07it/s]
+eval model::  17%|█▋        | 87/500 [00:13&lt;00:22, 18.62it/s]
+eval model::  18%|█▊        | 89/500 [00:13&lt;00:21, 18.85it/s]
+eval model::  18%|█▊        | 91/500 [00:13&lt;00:22, 18.16it/s]
+eval model::  19%|█▊        | 93/500 [00:13&lt;00:22, 17.76it/s]
+eval model::  19%|█▉        | 96/500 [00:13&lt;00:20, 19.75it/s]
+eval model::  20%|█▉        | 99/500 [00:13&lt;00:21, 18.94it/s]
+eval model::  20%|██        | 101/500 [00:14&lt;00:21, 18.73it/s]
+eval model::  21%|██        | 103/500 [00:14&lt;00:23, 17.02it/s]
+eval model::  21%|██        | 106/500 [00:14&lt;00:20, 18.77it/s]
+eval model::  22%|██▏       | 109/500 [00:14&lt;00:20, 18.92it/s]
+eval model::  22%|██▏       | 112/500 [00:14&lt;00:19, 19.91it/s]
+eval model::  23%|██▎       | 115/500 [00:14&lt;00:18, 20.43it/s]
+eval model::  24%|██▎       | 118/500 [00:14&lt;00:17, 22.08it/s]
+eval model::  24%|██▍       | 121/500 [00:15&lt;00:17, 22.12it/s]
+eval model::  25%|██▍       | 124/500 [00:15&lt;00:19, 19.67it/s]
+eval model::  25%|██▌       | 127/500 [00:15&lt;00:18, 20.36it/s]
+eval model::  26%|██▌       | 130/500 [00:15&lt;00:18, 20.47it/s]
+eval model::  27%|██▋       | 133/500 [00:15&lt;00:18, 20.38it/s]
+eval model::  27%|██▋       | 136/500 [00:15&lt;00:17, 21.04it/s]
+eval model::  28%|██▊       | 139/500 [00:15&lt;00:18, 19.49it/s]
+eval model::  28%|██▊       | 142/500 [00:16&lt;00:17, 20.35it/s]
+eval model::  29%|██▉       | 145/500 [00:16&lt;00:17, 20.41it/s]
+eval model::  30%|██▉       | 148/500 [00:16&lt;00:18, 19.52it/s]
+eval model::  30%|███       | 150/500 [00:16&lt;00:17, 19.59it/s]
+eval model::  30%|███       | 152/500 [00:16&lt;00:19, 18.31it/s]
+eval model::  31%|███       | 155/500 [00:16&lt;00:17, 19.41it/s]
+eval model::  31%|███▏      | 157/500 [00:16&lt;00:22, 14.97it/s]
+eval model::  32%|███▏      | 160/500 [00:17&lt;00:19, 17.33it/s]
+eval model::  33%|███▎      | 163/500 [00:17&lt;00:17, 19.43it/s]
+eval model::  33%|███▎      | 166/500 [00:17&lt;00:15, 20.89it/s]
+eval model::  34%|███▍      | 169/500 [00:17&lt;00:15, 21.05it/s]
+eval model::  34%|███▍      | 172/500 [00:17&lt;00:14, 22.90it/s]
+eval model::  35%|███▌      | 175/500 [00:17&lt;00:14, 22.84it/s]
+eval model::  36%|███▌      | 178/500 [00:17&lt;00:13, 23.55it/s]
+eval model::  36%|███▌      | 181/500 [00:17&lt;00:12, 25.14it/s]
+eval model::  37%|███▋      | 184/500 [00:18&lt;00:13, 23.82it/s]
+eval model::  37%|███▋      | 187/500 [00:18&lt;00:12, 24.16it/s]
+eval model::  38%|███▊      | 190/500 [00:18&lt;00:13, 22.38it/s]
+eval model::  39%|███▊      | 193/500 [00:18&lt;00:14, 21.89it/s]
+eval model::  39%|███▉      | 196/500 [00:18&lt;00:13, 22.71it/s]
+eval model::  40%|███▉      | 199/500 [00:18&lt;00:13, 22.41it/s]
+eval model::  40%|████      | 202/500 [00:18&lt;00:12, 23.69it/s]
+eval model::  41%|████      | 205/500 [00:19&lt;00:15, 19.36it/s]
+eval model::  42%|████▏     | 208/500 [00:19&lt;00:14, 20.61it/s]
+eval model::  42%|████▏     | 211/500 [00:19&lt;00:13, 20.78it/s]
+eval model::  43%|████▎     | 214/500 [00:19&lt;00:13, 21.78it/s]
+eval model::  43%|████▎     | 217/500 [00:19&lt;00:12, 23.44it/s]
+eval model::  44%|████▍     | 220/500 [00:19&lt;00:12, 23.07it/s]
+eval model::  45%|████▍     | 223/500 [00:19&lt;00:11, 23.56it/s]
+eval model::  45%|████▌     | 226/500 [00:19&lt;00:11, 23.83it/s]
+eval model::  46%|████▌     | 229/500 [00:20&lt;00:13, 20.54it/s]
+eval model::  46%|████▋     | 232/500 [00:20&lt;00:13, 20.36it/s]
+eval model::  47%|████▋     | 235/500 [00:20&lt;00:12, 21.41it/s]
+eval model::  48%|████▊     | 238/500 [00:20&lt;00:12, 21.43it/s]
+eval model::  48%|████▊     | 241/500 [00:20&lt;00:11, 22.50it/s]
+eval model::  49%|████▉     | 244/500 [00:20&lt;00:11, 22.90it/s]
+eval model::  49%|████▉     | 247/500 [00:20&lt;00:10, 23.66it/s]
+eval model::  50%|█████     | 250/500 [00:21&lt;00:10, 24.48it/s]
+eval model::  51%|█████     | 253/500 [00:21&lt;00:09, 25.38it/s]
+eval model::  51%|█████     | 256/500 [00:21&lt;00:10, 23.24it/s]
+eval model::  52%|█████▏    | 259/500 [00:21&lt;00:10, 23.25it/s]
+eval model::  52%|█████▏    | 262/500 [00:21&lt;00:10, 23.78it/s]
+eval model::  53%|█████▎    | 265/500 [00:21&lt;00:09, 24.68it/s]
+eval model::  54%|█████▎    | 268/500 [00:21&lt;00:09, 25.56it/s]
+eval model::  54%|█████▍    | 271/500 [00:21&lt;00:09, 24.45it/s]
+eval model::  55%|█████▍    | 274/500 [00:22&lt;00:09, 24.45it/s]
+eval model::  55%|█████▌    | 277/500 [00:22&lt;00:09, 24.06it/s]
+eval model::  56%|█████▌    | 280/500 [00:22&lt;00:09, 24.31it/s]
+eval model::  57%|█████▋    | 283/500 [00:22&lt;00:09, 23.55it/s]
+eval model::  57%|█████▋    | 286/500 [00:22&lt;00:08, 24.47it/s]
+eval model::  58%|█████▊    | 289/500 [00:22&lt;00:09, 22.93it/s]
+eval model::  58%|█████▊    | 292/500 [00:22&lt;00:09, 23.06it/s]
+eval model::  59%|█████▉    | 295/500 [00:22&lt;00:09, 21.39it/s]
+eval model::  60%|█████▉    | 298/500 [00:23&lt;00:09, 21.01it/s]
+eval model::  60%|██████    | 301/500 [00:23&lt;00:10, 18.47it/s]
+eval model::  61%|██████    | 304/500 [00:23&lt;00:09, 20.36it/s]
+eval model::  61%|██████▏   | 307/500 [00:23&lt;00:09, 19.81it/s]
+eval model::  62%|██████▏   | 310/500 [00:23&lt;00:09, 20.57it/s]
+eval model::  63%|██████▎   | 313/500 [00:23&lt;00:09, 20.25it/s]
+eval model::  63%|██████▎   | 316/500 [00:24&lt;00:09, 20.09it/s]
+eval model::  64%|██████▍   | 319/500 [00:24&lt;00:08, 21.80it/s]
+eval model::  64%|██████▍   | 322/500 [00:24&lt;00:08, 19.90it/s]
+eval model::  65%|██████▌   | 325/500 [00:24&lt;00:08, 20.17it/s]
+eval model::  66%|██████▌   | 328/500 [00:24&lt;00:08, 20.66it/s]
+eval model::  66%|██████▌   | 331/500 [00:24&lt;00:07, 21.45it/s]
+eval model::  67%|██████▋   | 334/500 [00:24&lt;00:07, 22.05it/s]
+eval model::  67%|██████▋   | 337/500 [00:25&lt;00:08, 19.80it/s]
+eval model::  68%|██████▊   | 340/500 [00:25&lt;00:07, 20.31it/s]
+eval model::  69%|██████▊   | 343/500 [00:25&lt;00:07, 22.02it/s]
+eval model::  69%|██████▉   | 346/500 [00:25&lt;00:07, 20.40it/s]
+eval model::  70%|██████▉   | 349/500 [00:25&lt;00:07, 20.99it/s]
+eval model::  70%|███████   | 352/500 [00:25&lt;00:07, 20.44it/s]
+eval model::  71%|███████   | 355/500 [00:25&lt;00:06, 21.23it/s]
+eval model::  72%|███████▏  | 358/500 [00:26&lt;00:06, 21.95it/s]
+eval model::  72%|███████▏  | 361/500 [00:26&lt;00:06, 23.11it/s]
+eval model::  73%|███████▎  | 364/500 [00:26&lt;00:06, 21.97it/s]
+eval model::  73%|███████▎  | 367/500 [00:26&lt;00:05, 22.67it/s]
+eval model::  74%|███████▍  | 370/500 [00:26&lt;00:06, 20.52it/s]
+eval model::  75%|███████▍  | 373/500 [00:26&lt;00:05, 22.24it/s]
+eval model::  75%|███████▌  | 376/500 [00:26&lt;00:05, 21.59it/s]
+eval model::  76%|███████▌  | 379/500 [00:26&lt;00:05, 22.09it/s]
+eval model::  76%|███████▋  | 382/500 [00:27&lt;00:05, 21.17it/s]
+eval model::  77%|███████▋  | 385/500 [00:27&lt;00:05, 21.56it/s]
+eval model::  78%|███████▊  | 388/500 [00:27&lt;00:05, 20.60it/s]
+eval model::  78%|███████▊  | 391/500 [00:27&lt;00:04, 22.19it/s]
+eval model::  79%|███████▉  | 394/500 [00:27&lt;00:04, 22.19it/s]
+eval model::  79%|███████▉  | 397/500 [00:27&lt;00:04, 23.53it/s]
+eval model::  80%|████████  | 400/500 [00:27&lt;00:04, 22.48it/s]
+eval model::  81%|████████  | 403/500 [00:28&lt;00:04, 23.03it/s]
+eval model::  81%|████████  | 406/500 [00:28&lt;00:04, 21.86it/s]
+eval model::  82%|████████▏ | 409/500 [00:28&lt;00:04, 21.82it/s]
+eval model::  82%|████████▏ | 412/500 [00:28&lt;00:04, 21.81it/s]
+eval model::  83%|████████▎ | 415/500 [00:28&lt;00:04, 17.89it/s]
+eval model::  83%|████████▎ | 417/500 [00:28&lt;00:04, 18.09it/s]
+eval model::  84%|████████▍ | 420/500 [00:28&lt;00:04, 19.54it/s]
+eval model::  85%|████████▍ | 423/500 [00:29&lt;00:03, 21.34it/s]
+eval model::  85%|████████▌ | 426/500 [00:29&lt;00:03, 21.98it/s]
+eval model::  86%|████████▌ | 429/500 [00:29&lt;00:03, 21.10it/s]
+eval model::  86%|████████▋ | 432/500 [00:29&lt;00:03, 20.41it/s]
+eval model::  87%|████████▋ | 435/500 [00:29&lt;00:03, 20.86it/s]
+eval model::  88%|████████▊ | 438/500 [00:29&lt;00:02, 21.49it/s]
+eval model::  88%|████████▊ | 441/500 [00:30&lt;00:03, 17.85it/s]
+eval model::  89%|████████▉ | 444/500 [00:30&lt;00:02, 19.56it/s]
+eval model::  89%|████████▉ | 447/500 [00:30&lt;00:02, 19.42it/s]
+eval model::  90%|█████████ | 450/500 [00:30&lt;00:02, 20.27it/s]
+eval model::  91%|█████████ | 453/500 [00:30&lt;00:02, 21.03it/s]
+eval model::  91%|█████████ | 456/500 [00:30&lt;00:01, 22.16it/s]
+eval model::  92%|█████████▏| 459/500 [00:30&lt;00:01, 23.01it/s]
+eval model::  92%|█████████▏| 462/500 [00:30&lt;00:01, 24.08it/s]
+eval model::  93%|█████████▎| 465/500 [00:31&lt;00:01, 23.59it/s]
+eval model::  94%|█████████▎| 468/500 [00:31&lt;00:01, 19.71it/s]
+eval model::  94%|█████████▍| 471/500 [00:31&lt;00:01, 19.73it/s]
+eval model::  95%|█████████▍| 474/500 [00:31&lt;00:01, 19.36it/s]
+eval model::  95%|█████████▌| 477/500 [00:31&lt;00:01, 19.90it/s]
+eval model::  96%|█████████▌| 480/500 [00:31&lt;00:00, 20.68it/s]
+eval model::  97%|█████████▋| 483/500 [00:31&lt;00:00, 22.18it/s]
+eval model::  97%|█████████▋| 486/500 [00:32&lt;00:00, 21.76it/s]
+eval model::  98%|█████████▊| 489/500 [00:32&lt;00:00, 22.67it/s]
+eval model::  98%|█████████▊| 492/500 [00:32&lt;00:00, 23.78it/s]
+eval model::  99%|█████████▉| 495/500 [00:32&lt;00:00, 23.53it/s]
+eval model:: 100%|█████████▉| 498/500 [00:32&lt;00:00, 23.97it/s]
+eval model:: 100%|██████████| 500/500 [00:32&lt;00:00, 15.30it/s]
+[2024/11/03 04:51:45] ppocr INFO: cur metric, precision: 0.7611527832609554, recall: 0.6269918699186992, hmean: 0.6875891583452212, fps: 28.198555018217274
+[2024/11/03 04:51:45] ppocr INFO: save best model is to ./output/ch_PP-OCR_V3_det/best_accuracy
+[2024/11/03 04:51:45] ppocr INFO: best metric, hmean: 0.6875891583452212, is_float16: False, precision: 0.7611527832609554, recall: 0.6269918699186992, fps: 28.198555018217274, best_epoch: 7
+[2024/11/03 04:51:57] ppocr INFO: epoch: [7/9], global_step: 410, lr: 0.000053, loss: 1.931753, loss_shrink_maps: 1.127667, loss_threshold_maps: 0.598593, loss_binary_maps: 0.225462, loss_cbn: 0.000000, avg_reader_cost: 0.41823 s, avg_batch_cost: 1.00690 s, avg_samples: 8.0, ips: 7.94518 samples/s, eta: 0:06:03, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:52:29] ppocr INFO: epoch: [7/9], global_step: 420, lr: 0.000050, loss: 2.068067, loss_shrink_maps: 1.209053, loss_threshold_maps: 0.629119, loss_binary_maps: 0.242052, loss_cbn: 0.000000, avg_reader_cost: 1.99668 s, avg_batch_cost: 2.56330 s, avg_samples: 8.0, ips: 3.12097 samples/s, eta: 0:05:41, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:52:56] ppocr INFO: epoch: [7/9], global_step: 430, lr: 0.000047, loss: 2.313782, loss_shrink_maps: 1.401592, loss_threshold_maps: 0.638423, loss_binary_maps: 0.279927, loss_cbn: 0.000000, avg_reader_cost: 2.00502 s, avg_batch_cost: 2.58325 s, avg_samples: 8.0, ips: 3.09688 samples/s, eta: 0:05:18, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:53:17] ppocr INFO: epoch: [7/9], global_step: 440, lr: 0.000044, loss: 2.345259, loss_shrink_maps: 1.407669, loss_threshold_maps: 0.626240, loss_binary_maps: 0.280534, loss_cbn: 0.000000, avg_reader_cost: 1.43449 s, avg_batch_cost: 1.87595 s, avg_samples: 8.0, ips: 4.26451 samples/s, eta: 0:04:54, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:53:17] ppocr INFO: epoch: [7/9], global_step: 441, lr: 0.000044, loss: 2.245091, loss_shrink_maps: 1.351916, loss_threshold_maps: 0.618339, loss_binary_maps: 0.269428, loss_cbn: 0.000000, avg_reader_cost: 0.00019 s, avg_batch_cost: 0.01447 s, avg_samples: 0.4, ips: 27.64899 samples/s, eta: 0:04:51, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:53:18] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:53:49] ppocr INFO: epoch: [8/9], global_step: 450, lr: 0.000042, loss: 2.117996, loss_shrink_maps: 1.241391, loss_threshold_maps: 0.608490, loss_binary_maps: 0.248037, loss_cbn: 0.000000, avg_reader_cost: 1.62754 s, avg_batch_cost: 2.06135 s, avg_samples: 7.2, ips: 3.49285 samples/s, eta: 0:04:30, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:54:15] ppocr INFO: epoch: [8/9], global_step: 460, lr: 0.000039, loss: 2.087634, loss_shrink_maps: 1.223752, loss_threshold_maps: 0.607135, loss_binary_maps: 0.244480, loss_cbn: 0.000000, avg_reader_cost: 1.08461 s, avg_batch_cost: 1.61020 s, avg_samples: 8.0, ips: 4.96832 samples/s, eta: 0:04:05, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:54:47] ppocr INFO: epoch: [8/9], global_step: 470, lr: 0.000036, loss: 2.004470, loss_shrink_maps: 1.177044, loss_threshold_maps: 0.585685, loss_binary_maps: 0.235546, loss_cbn: 0.000000, avg_reader_cost: 2.05344 s, avg_batch_cost: 2.59522 s, avg_samples: 8.0, ips: 3.08260 samples/s, eta: 0:03:43, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:55:13] ppocr INFO: epoch: [8/9], global_step: 480, lr: 0.000034, loss: 1.992268, loss_shrink_maps: 1.166128, loss_threshold_maps: 0.586720, loss_binary_maps: 0.233275, loss_cbn: 0.000000, avg_reader_cost: 1.82055 s, avg_batch_cost: 2.40796 s, avg_samples: 8.0, ips: 3.32231 samples/s, eta: 0:03:20, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:55:48] ppocr INFO: epoch: [8/9], global_step: 490, lr: 0.000031, loss: 1.992268, loss_shrink_maps: 1.167522, loss_threshold_maps: 0.592154, loss_binary_maps: 0.233278, loss_cbn: 0.000000, avg_reader_cost: 1.58120 s, avg_batch_cost: 2.12634 s, avg_samples: 8.0, ips: 3.76234 samples/s, eta: 0:02:57, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:56:08] ppocr INFO: epoch: [8/9], global_step: 500, lr: 0.000029, loss: 2.146404, loss_shrink_maps: 1.249529, loss_threshold_maps: 0.646653, loss_binary_maps: 0.250221, loss_cbn: 0.000000, avg_reader_cost: 0.21264 s, avg_batch_cost: 0.73781 s, avg_samples: 8.0, ips: 10.84296 samples/s, eta: 0:02:32, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:56:12] ppocr INFO: epoch: [8/9], global_step: 504, lr: 0.000028, loss: 2.225155, loss_shrink_maps: 1.300825, loss_threshold_maps: 0.652690, loss_binary_maps: 0.260284, loss_cbn: 0.000000, avg_reader_cost: 0.14103 s, avg_batch_cost: 0.25246 s, avg_samples: 2.8, ips: 11.09088 samples/s, eta: 0:02:22, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:56:12] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:56:38] ppocr INFO: epoch: [9/9], global_step: 510, lr: 0.000026, loss: 2.225155, loss_shrink_maps: 1.300825, loss_threshold_maps: 0.659072, loss_binary_maps: 0.260284, loss_cbn: 0.000000, avg_reader_cost: 2.14283 s, avg_batch_cost: 2.53641 s, avg_samples: 4.8, ips: 1.89244 samples/s, eta: 0:02:09, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:57:02] ppocr INFO: epoch: [9/9], global_step: 520, lr: 0.000024, loss: 2.134806, loss_shrink_maps: 1.288284, loss_threshold_maps: 0.612116, loss_binary_maps: 0.257768, loss_cbn: 0.000000, avg_reader_cost: 1.67361 s, avg_batch_cost: 2.15418 s, avg_samples: 8.0, ips: 3.71371 samples/s, eta: 0:01:47, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:57:30] ppocr INFO: epoch: [9/9], global_step: 530, lr: 0.000021, loss: 1.980161, loss_shrink_maps: 1.148722, loss_threshold_maps: 0.590031, loss_binary_maps: 0.230329, loss_cbn: 0.000000, avg_reader_cost: 1.95521 s, avg_batch_cost: 2.57726 s, avg_samples: 8.0, ips: 3.10407 samples/s, eta: 0:01:24, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:58:03] ppocr INFO: epoch: [9/9], global_step: 540, lr: 0.000019, loss: 2.022417, loss_shrink_maps: 1.164846, loss_threshold_maps: 0.595614, loss_binary_maps: 0.233264, loss_cbn: 0.000000, avg_reader_cost: 2.37479 s, avg_batch_cost: 2.93655 s, avg_samples: 8.0, ips: 2.72428 samples/s, eta: 0:01:01, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:58:39] ppocr INFO: epoch: [9/9], global_step: 550, lr: 0.000017, loss: 2.125406, loss_shrink_maps: 1.259481, loss_threshold_maps: 0.639860, loss_binary_maps: 0.251433, loss_cbn: 0.000000, avg_reader_cost: 2.94293 s, avg_batch_cost: 3.43275 s, avg_samples: 8.0, ips: 2.33049 samples/s, eta: 0:00:39, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:58:58] ppocr INFO: epoch: [9/9], global_step: 560, lr: 0.000015, loss: 2.105257, loss_shrink_maps: 1.247652, loss_threshold_maps: 0.644058, loss_binary_maps: 0.249112, loss_cbn: 0.000000, avg_reader_cost: 1.12843 s, avg_batch_cost: 1.69826 s, avg_samples: 8.0, ips: 4.71070 samples/s, eta: 0:00:16, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:59:05] ppocr INFO: epoch: [9/9], global_step: 567, lr: 0.000014, loss: 2.059302, loss_shrink_maps: 1.213146, loss_threshold_maps: 0.593973, loss_binary_maps: 0.242463, loss_cbn: 0.000000, avg_reader_cost: 0.43328 s, avg_batch_cost: 0.67443 s, avg_samples: 5.2, ips: 7.71022 samples/s, eta: 0:00:00, max_mem_reserved: 6488 MB, max_mem_allocated: 5427 MB
+[2024/11/03 04:59:06] ppocr INFO: save model in ./output/ch_PP-OCR_V3_det/latest
+[2024/11/03 04:59:06] ppocr INFO: best metric, hmean: 0.6875891583452212, is_float16: False, precision: 0.7611527832609554, recall: 0.6269918699186992, fps: 28.198555018217274, best_epoch: 7
+I1103 04:59:06.580554   166 tcp_store.cc:273] receive shutdown event and so quit from MasterDaemon run loop
+LAUNCH INFO 2024-11-03 04:59:07,726 Pod completed
+LAUNCH INFO 2024-11-03 04:59:07,726 Exit code 0</code></pre>
+</div>
+<p>:::</p>
+</section>
+</section>
+<section id="inference" class="level2">
+<h2 class="anchored" data-anchor-id="inference">Inference</h2>
+<p>Export the fine-tuned model to an inference format using PaddleOCR’s export script. The arguments specify: - The configuration file - The path to the pretrained model weights. We’re going to use the model <code>best_accuracy.pdparams</code> that was generated in the directory we specify in <code>config["Global"]["save_model_dir"]</code>. - The output directory for the saved inference model.</p>
+<div id="31992dd8" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:08.141039Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:08.140655Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:17.603146Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:17.602139Z&quot;}" data-papermill="{&quot;duration&quot;:9.492833,&quot;end_time&quot;:&quot;2024-11-03T04:59:17.605740&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:08.112907&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python3 <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span>PaddleOCR<span class="op">/</span>tools<span class="op">/</span>export_model.py <span class="op">-</span>c <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span>config.yml <span class="op">-</span>o Global.pretrained_model<span class="op">=</span><span class="st">"/kaggle/working/output/ch_PP-OCR_V3_det/best_accuracy.pdparams"</span> Global.save_inference_dir<span class="op">=</span><span class="st">"/kaggle/working/output/det-db-inference/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>W1103 04:59:12.464147   783 gpu_resources.cc:119] Please NOTE: device: 0, GPU Compute Capability: 7.5, Driver API Version: 12.4, Runtime API Version: 11.8
+W1103 04:59:12.465219   783 gpu_resources.cc:149] device: 0, cuDNN Version: 90.0.
+[2024/11/03 04:59:12] ppocr INFO: load pretrain successful from /kaggle/working/output/ch_PP-OCR_V3_det/best_accuracy
+I1103 04:59:16.345665   783 interpretercore.cc:237] New Executor is Running.
+[2024/11/03 04:59:16] ppocr INFO: inference model is saved to /kaggle/working/output/det-db-inference/inference
+[2024/11/03 04:59:16] ppocr INFO: Export inference config file to /kaggle/working/output/det-db-inference/inference.yml</code></pre>
+</div>
+</div>
+<p>Let’s make inference with some images with curved text.</p>
+<div id="7d6c82f8" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:17.710197Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:17.709310Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:24.671623Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:24.670466Z&quot;}" data-papermill="{&quot;duration&quot;:6.991242,&quot;end_time&quot;:&quot;2024-11-03T04:59:24.673975&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:17.682733&quot;,&quot;status&quot;:&quot;completed&quot;}" data-scrolled="true" data-tags="[]" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>python3 <span class="op">/</span>kaggle<span class="op">/</span>working<span class="op">/</span>PaddleOCR<span class="op">/</span>tools<span class="op">/</span>infer<span class="op">/</span>predict_det.py <span class="op">--</span>det_algorithm<span class="op">=</span><span class="st">"DB"</span> <span class="op">--</span>det_model_dir<span class="op">=</span><span class="st">"/kaggle/working/output/det-db-inference"</span> <span class="op">--</span>image_dir<span class="op">=</span><span class="st">"/kaggle/input/examples-for-fine-tuned-paddleocr-on-scutctw1500"</span> <span class="op">--</span>use_gpu<span class="op">=</span><span class="va">True</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[2024/11/03 04:59:22] ppocr WARNING: The first GPU is used for inference by default, GPU ID: 0
+[2024/11/03 04:59:23] ppocr INFO: 1oAxJ.jpg [[[1379.0, 2810.0], [1589.0, 2810.0], [1589.0, 2906.0], [1379.0, 2906.0]], [[1657.0, 2986.0], [2021.0, 2717.0], [2128.0, 2855.0], [1765.0, 3125.0]], [[804.0, 2516.0], [911.0, 2499.0], [936.0, 2654.0], [829.0, 2671.0]], [[2070.0, 2470.0], [2195.0, 2470.0], [2195.0, 2617.0], [2070.0, 2617.0]], [[1922.0, 2383.0], [2020.0, 2404.0], [1974.0, 2615.0], [1876.0, 2594.0]], [[997.0, 2205.0], [1121.0, 2205.0], [1121.0, 2633.0], [997.0, 2633.0]], [[1817.0, 2058.0], [1881.0, 2058.0], [1881.0, 2117.0], [1817.0, 2117.0]], [[1864.0, 1882.0], [2058.0, 1882.0], [2058.0, 2079.0], [1864.0, 2079.0]], [[851.0, 2037.0], [1082.0, 1810.0], [1211.0, 1936.0], [979.0, 2163.0]]]
+
+[2024/11/03 04:59:23] ppocr INFO: 0 The predict time of /kaggle/input/examples-for-fine-tuned-paddleocr-on-scutctw1500/1oAxJ.jpg: 0.5031492710113525
+[2024/11/03 04:59:23] ppocr INFO: The visualized image saved in ./inference_results/det_res_1oAxJ.jpg
+[2024/11/03 04:59:23] ppocr INFO: Captura de pantalla 2024-09-09 114728.png [[[58.0, 276.0], [280.0, 276.0], [280.0, 299.0], [58.0, 299.0]], [[93.0, 250.0], [244.0, 250.0], [244.0, 273.0], [93.0, 273.0]], [[56.0, 89.0], [89.0, 92.0], [80.0, 173.0], [47.0, 170.0]], [[246.0, 93.0], [270.0, 87.0], [280.0, 122.0], [256.0, 128.0]], [[69.0, 78.0], [88.0, 78.0], [88.0, 100.0], [69.0, 100.0]], [[243.0, 73.0], [256.0, 73.0], [256.0, 87.0], [243.0, 87.0]], [[167.0, 24.0], [199.0, 24.0], [199.0, 44.0], [167.0, 44.0]]]
+
+[2024/11/03 04:59:23] ppocr INFO: 1 The predict time of /kaggle/input/examples-for-fine-tuned-paddleocr-on-scutctw1500/Captura de pantalla 2024-09-09 114728.png: 0.04157447814941406
+[2024/11/03 04:59:23] ppocr INFO: The visualized image saved in ./inference_results/det_res_Captura de pantalla 2024-09-09 114728.png
+[2024/11/03 04:59:23] ppocr INFO: Captura de pantalla 2024-09-09 115835.png [[[155.0, 53.0], [255.0, 64.0], [252.0, 89.0], [152.0, 77.0]], [[72.0, 66.0], [162.0, 54.0], [165.0, 76.0], [75.0, 88.0]]]
+
+[2024/11/03 04:59:23] ppocr INFO: 2 The predict time of /kaggle/input/examples-for-fine-tuned-paddleocr-on-scutctw1500/Captura de pantalla 2024-09-09 115835.png: 0.015452146530151367
+[2024/11/03 04:59:23] ppocr INFO: The visualized image saved in ./inference_results/det_res_Captura de pantalla 2024-09-09 115835.png
+[2024/11/03 04:59:23] ppocr INFO: Captura de pantalla 2024-09-11 141037.png [[[39.0, 270.0], [233.0, 270.0], [233.0, 291.0], [39.0, 291.0]], [[38.0, 243.0], [237.0, 243.0], [237.0, 261.0], [38.0, 261.0]], [[7.0, 216.0], [261.0, 216.0], [261.0, 233.0], [7.0, 233.0]]]
+
+[2024/11/03 04:59:23] ppocr INFO: 3 The predict time of /kaggle/input/examples-for-fine-tuned-paddleocr-on-scutctw1500/Captura de pantalla 2024-09-11 141037.png: 0.027079105377197266
+[2024/11/03 04:59:23] ppocr INFO: The visualized image saved in ./inference_results/det_res_Captura de pantalla 2024-09-11 141037.png
+[2024/11/03 04:59:24] ppocr INFO: circular-text-photography-script-logo-design-template-034256fa3021b860a295f4f66c4d321b_screen.jpg [[[164.0, 302.0], [526.0, 302.0], [526.0, 353.0], [164.0, 353.0]]]
+
+[2024/11/03 04:59:24] ppocr INFO: 4 The predict time of /kaggle/input/examples-for-fine-tuned-paddleocr-on-scutctw1500/circular-text-photography-script-logo-design-template-034256fa3021b860a295f4f66c4d321b_screen.jpg: 0.05555558204650879
+[2024/11/03 04:59:24] ppocr INFO: The visualized image saved in ./inference_results/det_res_circular-text-photography-script-logo-design-template-034256fa3021b860a295f4f66c4d321b_screen.jpg</code></pre>
+</div>
+</div>
+<div id="7e1feb0c" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:24.727658Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:24.727291Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:24.764298Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:24.763486Z&quot;}" data-papermill="{&quot;duration&quot;:0.067771,&quot;end_time&quot;:&quot;2024-11-03T04:59:24.768040&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:24.700269&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>image <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">"/kaggle/working/inference_results/det_res_Captura de pantalla 2024-09-09 114728.png"</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>image</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+<figure class="figure">
+<p><img src="fine-tuning-paddleocr-det-model_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="8d0dff23" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:24.825806Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:24.825512Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:24.869750Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:24.868850Z&quot;}" data-papermill="{&quot;duration&quot;:0.078936,&quot;end_time&quot;:&quot;2024-11-03T04:59:24.875325&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:24.796389&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>Image.<span class="bu">open</span>(<span class="st">"/kaggle/working/inference_results/det_res_circular-text-photography-script-logo-design-template-034256fa3021b860a295f4f66c4d321b_screen.jpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+<figure class="figure">
+<p><img src="fine-tuning-paddleocr-det-model_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="f97ac658" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:24.940699Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:24.940104Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:24.957862Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:24.957026Z&quot;}" data-papermill="{&quot;duration&quot;:0.053472,&quot;end_time&quot;:&quot;2024-11-03T04:59:24.960976&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:24.907504&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>Image.<span class="bu">open</span>(<span class="st">"/kaggle/working/inference_results/det_res_Captura de pantalla 2024-09-11 141037.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+<figure class="figure">
+<p><img src="fine-tuning-paddleocr-det-model_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="fac10f75" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:25.029496Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:25.029185Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:25.053071Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:25.052261Z&quot;}" data-papermill="{&quot;duration&quot;:0.062354,&quot;end_time&quot;:&quot;2024-11-03T04:59:25.057492&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:24.995138&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>Image.<span class="bu">open</span>(<span class="st">"/kaggle/working/inference_results/det_res_Captura de pantalla 2024-09-09 115835.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+<figure class="figure">
+<p><img src="fine-tuning-paddleocr-det-model_files/figure-html/cell-19-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="15307ce7" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-11-03T04:59:25.132138Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-11-03T04:59:25.131542Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-11-03T04:59:26.476343Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-11-03T04:59:26.475249Z&quot;}" data-papermill="{&quot;duration&quot;:1.576329,&quot;end_time&quot;:&quot;2024-11-03T04:59:26.670733&quot;,&quot;exception&quot;:false,&quot;start_time&quot;:&quot;2024-11-03T04:59:25.094404&quot;,&quot;status&quot;:&quot;completed&quot;}" data-tags="[]" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>Image.<span class="bu">open</span>(<span class="st">"/kaggle/working/inference_results/det_res_1oAxJ.jpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+<figure class="figure">
+<p><img src="fine-tuning-paddleocr-det-model_files/figure-html/cell-20-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As we can see in the inference examples, our model struggles with curved text, despite being fine-tuned on a dataset with this type of text. Nonetheless, the metrics were not so bad, there is room for improvement, though, with hmean close to 0.70, precision near to 0.78 and recall around 0.62. The reason for these decent metrics is that not all text instances in the images are curved; there are also instances of text in the conventional horizontal layout, where the model performs well.</p>
+<p>All in all, it was a good warm up to learn how to fine-tune the PaddleOCR’s detection models. The next time we will try an algorithm specialized in curved text like SAST.</p>
+<p>Nothing would make me happier than knowing that my notebook has been helpful to you. If it has, please let me know with a like on the notebook! ❤️</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/karensanchez777\.github\.io\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
