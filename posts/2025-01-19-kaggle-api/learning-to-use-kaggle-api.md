@@ -1,8 +1,8 @@
 ---
 title: "Learn how to use the Kaggle API"
 author: "Karen Sánchez"
-date: "1/18/2025"
-categories: [Kaggle, API, Dataset]
+date: "1/19/2025"
+categories: [Kaggle, API, Dataset,TIL]
 ---
 
 Today I've learned how to download datasets from Kaggle using its API. Previously, I used to download datasets manually, but with the API, the process is much faster and more efficient.
