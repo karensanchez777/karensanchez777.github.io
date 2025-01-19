@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Karen Sánchez">
+<meta name="dcterms.date" content="2025-01-18">
 
-<title>karensanchez777.github.io</title>
+<title>Learn how to use the Kaggle API – karensanchez777.github.io</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +22,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-629dcf638af2de93fe5aeade506b5e99.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-629dcf638af2de93fe5aeade506b5e99.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,77 +102,19 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">karensanchez777.github.io</span>
     </a>
   </div>
@@ -149,7 +125,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -172,239 +148,122 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">karensanchez777.github.io</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">Learn how to use the Kaggle API</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Kaggle</div>
+                <div class="quarto-category">API</div>
+                <div class="quarto-category">Dataset</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Karen Sánchez </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 18, 2025</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(6)</span></div><div class="category" data-category="QVBJ">API <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGF0YXNldA==">Dataset <span class="quarto-category-count">(1)</span></div><div class="category" data-category="S2FnZ2xl">Kaggle <span class="quarto-category-count">(1)</span></div><div class="category" data-category="YW5hbHlzaXM=">analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Y29kZQ==">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bmV3cw==">news <span class="quarto-category-count">(2)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<p>Today I’ve learned how to download datasets from Kaggle using its API. Previously, I used to download datasets manually, but with the API, the process is much faster and more efficient.</p>
+<p>Here’s a step-by-step guide to downloading datasets using the Kaggle API, inspired by fast.ai’s <a href="https://youtu.be/cagqUrHMDJ0?list=PLfYUBJiXbdtSLBPJ1GMx-sQWf6iNhb8mM&amp;t=617">Live Coding 7 session</a>.</p>
+<section id="step-1-verify-kaggle-installation" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-verify-kaggle-installation">Step 1: Verify Kaggle Installation</h2>
+<p>First, check if Kaggle is installed by running the following command in your terminal:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kaggle</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-2-install-the-kaggle-package" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-install-the-kaggle-package">Step 2: Install the Kaggle Package</h2>
+<p>If the <code>kaggle</code> command is not recognized, install the package using pip:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">--user</span> kaggle</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You might see a warning similar to:</p>
+<pre><code>WARNING: The script slugify is installed in '/home/user/.local/bin' which is not on PATH.</code></pre>
+<p>Kaggle command line tool has been installed in your home directory (because of the <code>--user</code> flag in the previous command), specifically in the <code>.local/bin</code> folder, where there are executable files. However, this folder is not included in the <code>PATH</code> environment variable, the place where the shell looks for executables files associated with a given command (You can watch <a href="https://youtu.be/B6BQiIgiEks?list=PLfYUBJiXbdtSLBPJ1GMx-sQWf6iNhb8mM&amp;t=564">the part of Live Coding 3</a>, where Jeremy Howard talks about the concept <code>PATH</code> in the shells). As a result, typing <code>kaggle</code> again still doesn’t work out. We’ll address this issue in step number 3.</p>
+</section>
+<section id="step-3-update-the-path-variable" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-update-the-path-variable">Step 3: Update the PATH Variable</h2>
+<p>To resolve this warning, modify your PATH variable as follows:</p>
+<ol type="1">
+<li><p>Open your <code>.bashrc</code> file using vim:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vim</span> ~/.bashrc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Navigate to the end of the file with <code>Shift+g</code>.</p></li>
+<li><p>Open a new line by pressing <code>o</code>, and it automatically places the cursor in “Insert Mode” (you should see – INSERT – at the bottom of the screen).</p></li>
+<li><p>Add the following line:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>~/.local/bin:<span class="va">$PATH</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You might want to copy the above line to your clipboard (usually with <code>Ctrl+c</code>) and paste it in vim with a right-click of your mouse (but it depends on your terminal emulator).</p></li>
+<li><p>Press <code>Esc</code> to exit “Insert Mode”.</p></li>
+<li><p>Save and exit vim with <code>:wq</code>, then press <code>Enter</code>.</p></li>
+<li><p>Update your shell with the new PATH by running:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> !$</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>source</code> is used to read and execute the contents of a file in the current shell session, and <code>!$</code> represents the argument of the last command (remember it was <code>vim ~/.bashrc</code>), so in this case <code>!$</code> is the same as <code>~/.bashrc</code>.</p></li>
+</ol>
+<p>Now, the <code>kaggle</code> command should be recognized.</p>
+</section>
+<section id="step-4-add-your-kaggle-api-token" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-add-your-kaggle-api-token">Step 4: Add Your Kaggle API Token</h2>
+<p>The Kaggle API requires a <code>kaggle.json</code> file containing your credentials. Follow these steps to obtain and configure the file:</p>
+<ol type="1">
+<li>Visit Kaggle, click on your profile picture and select <strong>Settings</strong>.</li>
+<li>Scroll to the <strong>API</strong> section and click <strong>Create New Token</strong>.</li>
+<li>A <code>kaggle.json</code> file will be downloaded to your system.</li>
+</ol>
+<p>For Windows users, you can locate the file in your Downloads folder, typically at <code>/mnt/c/Users/&lt;YourUsername&gt;/Downloads</code></p>
+<ol start="4" type="1">
+<li><p>Create a <code>.kaggle</code> directory in your home folder:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> ~/.kaggle</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Copy the <code>kaggle.json</code> file to this directory:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> /mnt/c/Users/<span class="op">&lt;</span>YourUsername<span class="op">&gt;</span>/Downloads/kaggle.json ~/.kaggle</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Secure your API token by modifying its permissions:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 600 ~/.kaggle/kaggle.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="step-5-download-a-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-download-a-dataset">Step 5: Download a Dataset</h2>
+<p>To download a dataset, navigate to its Kaggle page and copy the download command. For example, to download the dataset for the <a href="https://www.kaggle.com/competitions/playground-series-s5e1/data">Playground Series Season 5 Episode 1 competition</a>:</p>
+<ol type="1">
+<li><p>Accept the competition rules on Kaggle, if applicable.</p></li>
+<li><p>Navigate to the directory in the terminal where you want to save the data.</p></li>
+<li><p>Run the download command:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kaggle</span> competitions download <span class="at">-c</span> playground-series-s5e1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="step-6-extract-the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="step-6-extract-the-dataset">Step 6: Extract the Dataset</h2>
+<p>The downloaded file will be a ZIP archive. Extract it using:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> <span class="at">-q</span> playground-series-s5e1.zip</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And that’s it! From now on, with the Kaggle API set up, you can download datasets effortlessly using just two commands:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kaggle</span> competitions download <span class="at">-c</span> <span class="op">&lt;</span>dataset-name<span class="op">&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> <span class="at">-q</span> <span class="op">&lt;</span>dataset-name<span class="op">&gt;</span>.zip</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="S2FnZ2xlJTJDQVBJJTJDRGF0YXNldA==" data-listing-date-sort="1737180000000" data-listing-file-modified-sort="1737258290713" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="631">
-<div class="thumbnail">
-<p><a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external"></a></p><a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external">Learn how to use the Kaggle API</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('S2FnZ2xl'); return false;">
-Kaggle
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('QVBJ'); return false;">
-API
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('RGF0YXNldA=='); return false;">
-Dataset
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external">Today I’ve learned how to download datasets from Kaggle using its API. Previously, I used to download datasets manually, but with the API, the process is much faster and…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html" class="no-external">
-<div class="listing-date">
-Jan 18, 2025
-</div>
-<div class="listing-author">
-Karen Sánchez
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-listing-date-sort="1737007200000" data-listing-file-modified-sort="1737079267141" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="903">
-<div class="thumbnail">
-<p><a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external"></a></p><a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external">
-<p><img loading="lazy" src="./posts/2025-01-16-paddleocr-texdet/robot-reading-curved-text.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external">Fine-tuning PaddleOCR’s text detection models</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external"></a>
-</div>
-<div class="listing-description">
-<a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external">We will learn how to fine-tune a PaddleOCR text detection model and to make inference with the fine-tuned model.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html" class="no-external">
-<div class="listing-date">
-Jan 16, 2025
-</div>
-<div class="listing-author">
-Karen Sánchez
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-listing-date-sort="1687327200000" data-listing-file-modified-sort="1737074426491" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3756">
-<div class="thumbnail">
-<p><a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external"></a></p><a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external">
-<p><img loading="lazy" src="./posts/2023-06-21-flower-classification/campo-de-flores.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external">Creando un clasificador con 102 Category Flower Dataset</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external"></a>
-</div>
-<div class="listing-description">
-<a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external">Entrenemos juntos un clasificador de flores usando el conjunto de datos ‘102 Category Flower Dataset’ y la librería de fastai.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2023-06-21-flower-classification/Flower-Classification-with-fastai-and-Oxford102.html" class="no-external">
-<div class="listing-date">
-Jun 21, 2023
-</div>
-<div class="listing-author">
-Karen Sánchez
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-listing-date-sort="1684648800000" data-listing-file-modified-sort="1736980610760" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="16">
-<div class="thumbnail">
-<p><a href="./posts/image-clasification/quarto-prueba.html" class="no-external"></a></p><a href="./posts/image-clasification/quarto-prueba.html" class="no-external">
-<p class="card-img-top"><img src="posts/image-clasification/quarto-prueba_files/figure-html/cell-4-output-4.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/image-clasification/quarto-prueba.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/image-clasification/quarto-prueba.html" class="no-external">First experiment</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/image-clasification/quarto-prueba.html" class="no-external"></a>
-</div>
-<div class="listing-description">
-<a href="./posts/image-clasification/quarto-prueba.html" class="no-external">Post description</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/image-clasification/quarto-prueba.html" class="no-external">
-<div class="listing-date">
-May 21, 2023
-</div>
-<div class="listing-author">
-Karen Sánchez
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="bmV3cyUyQ2NvZGUlMkNhbmFseXNpcw==" data-listing-date-sort="1678514400000" data-listing-file-modified-sort="1736980610760" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="7">
-<div class="thumbnail">
-<p><a href="./posts/post-with-code/index.html" class="no-external"></a></p><a href="./posts/post-with-code/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/post-with-code/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/post-with-code/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/post-with-code/index.html" class="no-external">Post With Code</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/post-with-code/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('bmV3cw=='); return false;">
-news
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Y29kZQ=='); return false;">
-code
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('YW5hbHlzaXM='); return false;">
-analysis
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/post-with-code/index.html" class="no-external">This is a post with executable code.</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/post-with-code/index.html" class="no-external">
-<div class="listing-date">
-Mar 11, 2023
-</div>
-<div class="listing-author">
-Harlow Malloc
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="bmV3cw==" data-listing-date-sort="1678255200000" data-listing-file-modified-sort="1736980610760" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="32">
-<div class="thumbnail">
-<p><a href="./posts/welcome/index.html" class="no-external"></a></p><a href="./posts/welcome/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/welcome/thumbnail.jpg"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/welcome/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/welcome/index.html" class="no-external">Welcome To My Blog</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/welcome/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('bmV3cw=='); return false;">
-news
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/welcome/index.html" class="no-external">This is the first post in a Quarto blog. Welcome!</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-date">
-Mar 8, 2023
-</div>
-<div class="listing-author">
-Tristan O’Malley
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -495,7 +354,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/karensanchez777\.github\.io\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

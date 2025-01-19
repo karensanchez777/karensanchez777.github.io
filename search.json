@@ -70,11 +70,67 @@
     "text": "This is my first experiment trying to blog using a Jupyter Notebook I’ve created in Kaggle.\n\nimport os\niskaggle = os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')\n\nif iskaggle:\n    !pip install -Uqq fastai duckduckgo_search\n\nERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\nydata-profiling 4.1.2 requires requests&lt;2.29,&gt;=2.24.0, but you have requests 2.30.0 which is incompatible.\nlibrosa 0.10.0.post2 requires soundfile&gt;=0.12.1, but you have soundfile 0.11.0 which is incompatible.\nkfp 1.8.20 requires google-api-python-client&lt;2,&gt;=1.7.8, but you have google-api-python-client 2.86.0 which is incompatible.\nkfp 1.8.20 requires PyYAML&lt;6,&gt;=5.3, but you have pyyaml 6.0 which is incompatible.\ngcsfs 2023.3.0 requires fsspec==2023.3.0, but you have fsspec 2023.4.0 which is incompatible.\nbeatrix-jupyterlab 2023.46.184821 requires jupyter-server~=1.16, but you have jupyter-server 2.5.0 which is incompatible.\napache-beam 2.46.0 requires dill&lt;0.3.2,&gt;=0.3.1.1, but you have dill 0.3.6 which is incompatible.\napache-beam 2.46.0 requires pyarrow&lt;10.0.0,&gt;=3.0.0, but you have pyarrow 10.0.1 which is incompatible.\n\n\n\nfrom duckduckgo_search import ddg_images\nfrom fastcore.all import *\n\ndef search_images(term, max_images=10):\n    print(f\"Searching for '{term}'\")\n    return L(ddg_images(term, max_results=max_images)).itemgot('image')\n\n\nfrom fastdownload import download_url\n# Ocupamos el siguiente modulo para abrir las imagenes con `Image.open` usar la clase Path, la función `doc`, etc\nfrom fastai.vision.all import *\n\ndownload_url(search_images('rosa flor', max_images=1)[0], 'rosa.jpg', show_progress=False)\nImage.open('rosa.jpg').to_thumb(256,256)\n\n/opt/conda/lib/python3.10/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version &gt;=1.16.5 and &lt;1.23.0 is required for this version of SciPy (detected version 1.23.5\n  warnings.warn(f\"A NumPy version &gt;={np_minversion} and &lt;{np_maxversion}\"\n\n\nSearching for 'rosa flor'\n\n\n/opt/conda/lib/python3.10/site-packages/duckduckgo_search/compat.py:60: UserWarning: ddg_images is deprecated. Use DDGS().images() generator\n  warnings.warn(\"ddg_images is deprecated. Use DDGS().images() generator\")\n/opt/conda/lib/python3.10/site-packages/duckduckgo_search/compat.py:64: UserWarning: parameter page is deprecated\n  warnings.warn(\"parameter page is deprecated\")\n/opt/conda/lib/python3.10/site-packages/duckduckgo_search/compat.py:66: UserWarning: parameter max_results is deprecated\n  warnings.warn(\"parameter max_results is deprecated\")\n\n\n\n\n\n\n\n\n\n\ndownload_url(search_images('flor de dalia', max_images=1)[0], 'dalia.jpg', show_progress=False)\nImage.open('dalia.jpg').to_thumb(256,256)\n\nSearching for 'flor de dalia'\n\n\n\n\n\n\n\n\n\n\ndownload_url(search_images('sunflower flower', max_images=1)[0], 'sunflower.jpg', show_progress=False)\nImage.open('sunflower.jpg').to_thumb(256,256)\n\nSearching for 'sunflower flower'\n\n\n\n\n\n\n\n\n\n\ndownload_url(search_images('pink primrose', max_images=1)[0], 'pink_primrose.jpg', show_progress=False)\nImage.open('pink_primrose.jpg').to_thumb(256,256)\n\nSearching for 'pink primrose'\n\n\n\n\n\n\n\n\n\n\nsearches = 'sunflower flower','pink primrose flower' # Karen: búsquedas de imagenes tipo Google Images\npath = Path('flowers')\nfrom time import sleep\n\nfor o in searches: # Karen: la 'o' se va a iterar, primero toma la cadena 'forest' y después la cadena 'bird'\n    dest = (path/o)# Karen: ¿qué significa path/o? La direccion donde lo vamos a guardar. El signo '/' no es para una división, sino que es la diagonal utilizada para especificar la direccion de la computadora donde está guardado un archivo.\n    dest.mkdir(exist_ok=True, parents=True)\n    download_images(dest, urls=search_images(f'{o}')) \n    sleep(10)  # Pause between searches to avoid over-loading server\n    resize_images(path/o, max_size=400, dest=path/o)\n\nSearching for 'sunflower flower'\nSearching for 'pink primrose flower'\n\n\n\nfailed = verify_images(get_image_files(path))\nfailed.map(Path.unlink)\nlen(failed)\n\n0\n\n\n\ndls = DataBlock(\n    blocks=(ImageBlock, CategoryBlock), #Karen: ImagenBlock=input, CategoryBlock=output\n    get_items=get_image_files, # Karen: los datos de entrenemiento; get_image_files es una función\n    splitter=RandomSplitter(valid_pct=0.2, seed=42), #Karen: separa los datos en un conjunto de entrenamiento y validación\n    get_y=parent_label, #Karen: y es la variable objetivo, este dato lo toma del nombre del folder en que está cada imagen\n    item_tfms=[Resize(192, method='squish')] # Para que todas las imágenes sean del mismo tamaño (solo si para Computer Vision)\n).dataloaders(path, bs=4)\n\ndls.show_batch(max_n=6)\n\n\n\n\n\n\n\n\n\nlen(dls.train)\n\n3\n\n\n\nlen(dls.valid)\n\n1\n\n\n\nlearn = vision_learner(dls, resnet18, metrics=error_rate) #Karen: dls=datos, restnet18= modelo = red neuronal\nlearn.fine_tune(1) #no empezamos desde cero, empezamos de un modelo preentrenado, fastai ajusta los pesos para que el modelo aprenda a reconocer nuestro conjunto de datos\n\n/opt/conda/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.\n  warnings.warn(\n/opt/conda/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.\n  warnings.warn(msg)\nDownloading: \"https://download.pytorch.org/models/resnet18-f37072fd.pth\" to /root/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth\n100%|██████████| 44.7M/44.7M [00:00&lt;00:00, 71.0MB/s]\n\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\nerror_rate\ntime\n\n\n\n\n0\n1.338883\n0.347549\n0.333333\n00:05\n\n\n\n\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\nerror_rate\ntime\n\n\n\n\n0\n0.795316\n0.193980\n0.000000\n00:01\n\n\n\n\n\n\nflower_name, index, probs=learn.predict('sunflower.jpg')\nprint(f'It is a {flower_name} with probability {probs[index]:.4f}')\n\n\n\n\n\n\n\n\nIt is a sunflower flower with probability 0.9705\n\n\n\nflower_name, index, probs=learn.predict('pink_primrose.jpg')\nprint(f'It is a {flower_name} with probability {probs[index]:.4f}')\n\n\n\n\n\n\n\n\nIt is a pink primrose flower with probability 0.6853\n\n\n\ninterp = ClassificationInterpretation.from_learner(learn)\ninterp.plot_confusion_matrix()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ninterp.plot_top_losses(3, nrows=2,figsize=(17,4))"
   },
   {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html",
+    "title": "Learn how to use the Kaggle API",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "Today I’ve learned how to download datasets from Kaggle using its API. Previously, I used to download datasets manually, but with the API, the process is much faster and more efficient.\nHere’s a step-by-step guide to downloading datasets using the Kaggle API, inspired by fast.ai’s Live Coding 7 session."
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-1-verify-kaggle-installation",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-1-verify-kaggle-installation",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Step 1: Verify Kaggle Installation",
+    "text": "Step 1: Verify Kaggle Installation\nFirst, check if Kaggle is installed by running the following command in your terminal:\nkaggle"
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-2-install-the-kaggle-package",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-2-install-the-kaggle-package",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Step 2: Install the Kaggle Package",
+    "text": "Step 2: Install the Kaggle Package\nIf the kaggle command is not recognized, install the package using pip:\npip install --user kaggle\nYou might see a warning similar to:\nWARNING: The script slugify is installed in '/home/user/.local/bin' which is not on PATH.\nKaggle command line tool has been installed in your home directory (because of the --user flag in the previous command), specifically in the .local/bin folder, where there are executable files. However, this folder is not included in the PATH environment variable, the place where the shell looks for executables files associated with a given command. (You can watch the part of Live Coding 3, where Jeremy Howard talks about the concept PATH in the shells.) As a result, typing kaggle again still doesn’t work out. We’ll address this issue in step number 3."
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-3-update-the-path-variable",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-3-update-the-path-variable",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Step 3: Update the PATH Variable",
+    "text": "Step 3: Update the PATH Variable\nTo resolve this warning, modify your PATH variable as follows:\n\nOpen your .bashrc file using vim:\nvim ~/.bashrc\nNavigate to the end of the file with Shift+g.\nOpen a new line by pressing o, and it automatically places the cursor in “Insert Mode” (you should see – INSERT – at the bottom of the screen).\nAdd the following line:\nexport PATH=~/.local/bin:$PATH\nYou might want to copy the above line to your clipboard (usually with Ctrl+c) and paste it in vim with a right-click of your mouse (but it depends on your terminal emulator).\nPress Esc to exit “Insert Mode”.\nSave and exit vim with :wq, then press Enter.\nUpdate your shell with the new PATH by running:\nsource !$\nsource is used to read and execute the contents of a file in the current shell session, and !$ represents the argument of the last command (remember it was vim ~/.bashrc), so in this case !$ is the same as ~/.bashrc.\n\nNow, the kaggle command should be recognized."
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-4-add-your-kaggle-api-token",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-4-add-your-kaggle-api-token",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Step 4: Add Your Kaggle API Token",
+    "text": "Step 4: Add Your Kaggle API Token\nThe Kaggle API requires a kaggle.json file containing your credentials. Follow these steps to obtain and configure the file:\n\nVisit Kaggle, click on your profile picture and select Settings.\nScroll to the API section and click Create New Token.\nA kaggle.json file will be downloaded to your system.\n\nFor Windows users, you can locate the file in your Downloads folder, typically at /mnt/c/Users/&lt;YourUsername&gt;/Downloads\n\nCreate a .kaggle directory in your home folder:\nmkdir ~/.kaggle\nCopy the kaggle.json file to this directory:\ncp /mnt/c/Users/&lt;YourUsername&gt;/Downloads/kaggle.json ~/.kaggle\nSecure your API token by modifying its permissions:\nchmod 600 ~/.kaggle/kaggle.json"
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-5-download-a-dataset",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-5-download-a-dataset",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Step 5: Download a Dataset",
+    "text": "Step 5: Download a Dataset\nTo download a dataset, navigate to its Kaggle page and copy the download command. For example, to download the dataset for the Playground Series Season 5 Episode 1 competition:\n\nAccept the competition rules on Kaggle, if applicable.\nNavigate to the directory in the terminal where you want to save the data.\nRun the download command:\nkaggle competitions download -c playground-series-s5e1"
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-6-extract-the-dataset",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#step-6-extract-the-dataset",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Step 6: Extract the Dataset",
+    "text": "Step 6: Extract the Dataset\nThe downloaded file will be a ZIP archive. Extract it using:\nunzip -q playground-series-s5e1.zip"
+  },
+  {
+    "objectID": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#conclusion",
+    "href": "posts/2025-01-19-kaggle-api/learning-to-use-kaggle-api.html#conclusion",
+    "title": "Learn how to use the Kaggle API",
+    "section": "Conclusion",
+    "text": "Conclusion\nAnd that’s it! From now on, with the Kaggle API set up, you can download datasets effortlessly using just two commands:\nkaggle competitions download -c &lt;dataset-name&gt;\nunzip -q &lt;dataset-name&gt;.zip"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "karensanchez777.github.io",
+    "section": "",
+    "text": "Learn how to use the Kaggle API\n\n\n\n\n\n\nKaggle\n\n\nAPI\n\n\nDataset\n\n\n\n\n\n\n\n\n\nJan 18, 2025\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nFine-tuning PaddleOCR’s text detection models\n\n\n\n\n\nWe will learn how to fine-tune a PaddleOCR text detection model and to make inference with the fine-tuned model.\n\n\n\n\n\nJan 16, 2025\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nCreando un clasificador con 102 Category Flower Dataset\n\n\n\n\n\nEntrenemos juntos un clasificador de flores usando el conjunto de datos ‘102 Category Flower Dataset’ y la librería de fastai.\n\n\n\n\n\nJun 21, 2023\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nFirst experiment\n\n\n\n\n\nPost description\n\n\n\n\n\nMay 21, 2023\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nMar 11, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMar 8, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -84,11 +140,11 @@
     "text": "About this blog"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "karensanchez777.github.io",
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
     "section": "",
-    "text": "Fine-tuning PaddleOCR’s text detection models\n\n\n\n\n\nWe will learn how to fine-tune a PaddleOCR text detection model and to make inference with the fine-tuned model.\n\n\n\n\n\nJan 16, 2025\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nCreando un clasificador con 102 Category Flower Dataset\n\n\n\n\n\nEntrenemos juntos un clasificador de flores usando el conjunto de datos ‘102 Category Flower Dataset’ y la librería de fastai.\n\n\n\n\n\nJun 21, 2023\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nFirst experiment\n\n\n\n\n\nPost description\n\n\n\n\n\nMay 21, 2023\n\n\nKaren Sánchez\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nMar 11, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMar 8, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
   },
   {
     "objectID": "posts/2025-01-16-paddleocr-texdet/fine-tuning-paddleocr-det-model.html",
