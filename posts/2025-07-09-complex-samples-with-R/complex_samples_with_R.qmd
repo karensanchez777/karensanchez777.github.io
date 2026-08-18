@@ -42,7 +42,17 @@ There are some subpopulations that need to be oversampled, that is, giving them 
 
 We're interested in analyzing the reasons people voluntary left or lost a job with data from Q1 ENOE 2025. This information is contained in the database of ENOE's basic questionnaire part 2 of the corresponding period of time, specifically, at questions 9, 9a, 9b, 9c and 9d.
 
-![Question 9](./report_images/p9.png) ![Question 9a](./report_images/p9a.png) ![Question 9b](./report_images/p9b.png) ![Question 9c](./report_images/p9c.png) ![Question 9d](./report_images/p9d.png)
+![](p9.png)
+
+![](p9a.png)
+
+![](p9a.png)
+
+![](p9b.png)
+
+![](p9c.png)
+
+![](p9d.png)
 
 We start by loading the dataset corresponding to the second part of the questionnaire and the one with the sociodemographic variables of participants.
 
